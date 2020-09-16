@@ -1,4 +1,9 @@
 #!/usr/bin/python
+
+####################################################
+# This is imported by all BME280 related examples! #
+####################################################
+
 import smbus
 import time
 from ctypes import c_short
