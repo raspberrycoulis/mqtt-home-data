@@ -74,10 +74,17 @@ void loop() {
   if (!client.connected()) {
     reconnect();
   }
+  handleTemperature();
+  delay(5000);
+  handleHumidity();
+  delay(5000);
+  handlePressure();
+  delay(5000);
+}
+
+void handleTemperature() {
   //float temperature = bme.readTemperature() - 2.193; // Calibrated value for sensor if housed in a case
   float temperature = bme.readTemperature();
-  float humidity = bme.readHumidity();
-  float pressure = bme.readPressure() / 100.0F;
   Serial.print("Temperature: ");
   Serial.print(temperature, 4); Serial.print("°C\t.");
   display.clear();
@@ -87,9 +94,13 @@ void loop() {
   display.setFont(ArialMT_Plain_24);
   display.drawString(64, 25, String(temperature, 2) + "°C");
   display.display();
-  delay(1000);
-  Serial.print("Humidity: ");
-  Serial.print(humidity, 4); Serial.print("% RH\t.");
+  String v1 = ("temp,room=living-room value=" + String(temperature));
+  client.publish(channel, v1.c_str(), true);
+  Serial.println("Temperature sent to MQTT server...");
+}
+
+void handleHumidity() {
+  float humidity = bme.readHumidity();
   display.clear();
   display.setTextAlignment(TEXT_ALIGN_CENTER);
   display.setFont(ArialMT_Plain_10);
@@ -97,9 +108,13 @@ void loop() {
   display.setFont(ArialMT_Plain_24);
   display.drawString(64, 25, String(humidity, 2) + "% RH");
   display.display();
-  delay(1000);
-  Serial.print("Pressure: ");
-  Serial.print(pressure, 4); Serial.print("hPa\t.");
+  String v2 = ("humidity,room=living-room value=" + String(humidity));
+  client.publish(channel, v2.c_str(), true);
+  Serial.println("Humidity sent to MQTT server...");
+}
+
+void handlePressure() {
+  float pressure = bme.readPressure() / 100.0F;
   display.clear();
   display.setTextAlignment(TEXT_ALIGN_CENTER);
   display.setFont(ArialMT_Plain_10);
@@ -107,13 +122,9 @@ void loop() {
   display.setFont(ArialMT_Plain_24);
   display.drawString(64, 25, String(pressure, 2) + "hPa");
   display.display();
-  String v1 = ("temp,room=living-room value=" + String(temperature));
-  String v2 = ("humidity,room=living-room value=" + String(humidity));
-  String v3 = ("pressure,room=living-room value=" + String(pressure)); 
-  client.publish(channel, v1.c_str(), true);
-  client.publish(channel, v2.c_str(), true);
+  String v3 = ("pressure,room=living-room value=" + String(pressure));
   client.publish(channel, v3.c_str(), true);
-  Serial.println("Data sent to MQTT server...");
-  delay(15000);
+  Serial.println("Pressure sent to MQTT server...");
 }
+
 //=========================================================================
