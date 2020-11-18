@@ -47,12 +47,6 @@ while (True):
 
   # Temperature and humidity data
   air_data = get_air_data(I2C_bus)
-  #humidity_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, H_READ, H_BYTES)
-  #humidity_integer = humidity_data[0]
-  #humidity_fraction = humidity_data[1]
-  #temperature_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, T_READ, T_BYTES)
-  #temperature_positive_integer = temperature_data[0] & TEMPERATURE_VALUE_MASK
-  #temperature_fraction = temperature_data[1]
 
   # Get air quality data
   air_quality_data = get_air_quality_data(I2C_bus)
@@ -77,10 +71,8 @@ while (True):
   client.publish("sensors", "temperature,room=test-ms430 value=" + "{:.1f}".format(air_data['T']))
   print("Humidity = {:.1f} %".format(air_data['H_pc']))
   client.publish("sensors", "humidity,room=test-ms430 value=" + "{:.1f}".format(air_data['H_pc']))
-  #print("Humidity = " + str(humidity_integer) + "." + str(humidity_fraction) + " %")
-  #client.publish("sensors", "humidity,room=office-ms430 value=" + str(humidity_integer) + "." + str(humidity_fraction))
-  #print("Temperature = " + str(temperature_positive_integer) + "." + str(temperature_fraction) + " Â°C")
-  #client.publish("sensors", "temperature,room=office-ms430 value=" + str(temperature_positive_integer) + "." + str(temperature_fraction))
+  print("Lux = {:.2f} lux".format(light_data['illum_lux']))
+  client.publish("sensors", "lux,room=test-ms340 value=" + "{:.2f}".format(light_data['illum_lux']))
   #print("Lux = " + str(lux_integer_lsb) + "." + str(lux_fraction) + " lux")
   #client.publish("sensors", "lux,room=office-ms430 value=" + str(lux_integer_lsb) + "." + str(lux_fraction))
   #print("Sound pressure = " + str(sound_integer) + "." + str(sound_fraction) + " dBA")
