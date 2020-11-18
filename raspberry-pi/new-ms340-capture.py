@@ -53,10 +53,6 @@ while (True):
 
   # Get light data
   light_data = get_light_data(I2C_bus)
-  #lux_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, ILLUMINANCE_READ, ILLUMINANCE_BYTES)
-  #lux_integer_lsb = lux_data[0]
-  #lux_integer_msb = lux_data[1]
-  #lux_fraction = lux_data[2]
 
   # Get sound data
   sound_data = get_sound_data(I2C_bus)
@@ -73,8 +69,8 @@ while (True):
   client.publish("sensors", "humidity,room=test-ms430 value=" + "{:.1f}".format(air_data['H_pc']))
   print("Lux = {:.2f} lux".format(light_data['illum_lux']))
   client.publish("sensors", "lux,room=test-ms340 value=" + "{:.2f}".format(light_data['illum_lux']))
-  #print("Lux = " + str(lux_integer_lsb) + "." + str(lux_fraction) + " lux")
-  #client.publish("sensors", "lux,room=office-ms430 value=" + str(lux_integer_lsb) + "." + str(lux_fraction))
+  print("Sound pressure = {:.1f} mPa".format(sound_data['peak_amp_mPa']))
+  client.publish("sensors", "sound,room=test-ms340 value=" + "{:.1f}".format(sound_data['peak_amp_mPa']))
   #print("Sound pressure = " + str(sound_integer) + "." + str(sound_fraction) + " dBA")
   #client.publish("sensors", "sound,room=office-ms430 value=" + str(sound_integer) + "." + str(sound_fraction)) 
   #print("Data sent to MQTT broker, " + str(brokerAddress) + ".")
