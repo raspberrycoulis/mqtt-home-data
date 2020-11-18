@@ -73,8 +73,9 @@ while (True):
   # Send data to MQTT
   client = mqtt.Client(clientName)
   client.connect(brokerAddress)
-  print("Temperature = {:.1f} ".format(air_data['T_C']) + air_data['C_unit'] + "°C")
-  print("Humidity = {:.1f} %".format(air_data['H_pc']) + " %")
+  print("Temperature = {:.1f} ".format(air_data['T_C']) + air_data['C_unit'])
+  client.publish("sensors", "temperature,room=test-ms430 value=" + str(air_data['T_C'])
+  print("Humidity = {:.1f} %".format(air_data['H_pc']))
   #print("Humidity = " + str(humidity_integer) + "." + str(humidity_fraction) + " %")
   #client.publish("sensors", "humidity,room=office-ms430 value=" + str(humidity_integer) + "." + str(humidity_fraction))
   #print("Temperature = " + str(temperature_positive_integer) + "." + str(temperature_fraction) + " Â°C")
