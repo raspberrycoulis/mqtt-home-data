@@ -88,8 +88,10 @@ while (True):
   client.publish("sensors", "humidity,room=office-ms430 value=" + str(humidity_integer) + "." + str(humidity_fraction))
   print("Temperature = " + str(temperature_positive_integer) + "." + str(temperature_fraction) + " °C")
   client.publish("sensors", "temperature,room=office-ms430 value=" + str(temperature_positive_integer) + "." + str(temperature_fraction))
-  print("Lux = " + str(lux_integer_lsb) + str(lux_integer_msb) + "." + str(lux_fraction) + " lux")
-  client.publish("sensors", "lux,room=office-ms430 value=" + str(lux_integer_lsb) + str(lux_integer_msb) + "." + str(lux_fraction))
+  #print("Lux = " + str(lux_integer_lsb) + str(lux_integer_msb) + "." + str(lux_fraction) + " lux") # Was giving incorrect reading
+  print("Lux = " + str(lux_integer_lsb) + "." + str(lux_fraction) + " lux")
+  #client.publish("sensors", "lux,room=office-ms430 value=" + str(lux_integer_lsb) + str(lux_integer_msb) + "." + str(lux_fraction)) # Was giving incorrect reading
+  client.publish("sensors", "lux,room=office-ms430 value=" + str(lux_integer_lsb) + "." + str(lux_fraction))
   #print("Gas resistance = " + str(gas_integer) + " ohm")
   #client.publish("sensors", "gas-resistance,room=office-ms430 value=" + str(gas_integer))
   #print("Air quality index = " + str(aq_integer_lsb) + str(aq_integer_msb) + "." + str(aq_fraction))
