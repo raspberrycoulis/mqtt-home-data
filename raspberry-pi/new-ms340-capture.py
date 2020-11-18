@@ -76,6 +76,7 @@ while (True):
   print("Temperature = {:.1f} ".format(air_data['T_C']) + air_data['C_unit'])
   client.publish("sensors", "temperature,room=test-ms430 value=" + "{:.1f}".format(air_data['T']))
   print("Humidity = {:.1f} %".format(air_data['H_pc']))
+  client.publish("sensors", "humidity,room=test-ms430 value=" + "{:.1f}".format(air_data['H_pc']))
   #print("Humidity = " + str(humidity_integer) + "." + str(humidity_fraction) + " %")
   #client.publish("sensors", "humidity,room=office-ms430 value=" + str(humidity_integer) + "." + str(humidity_fraction))
   #print("Temperature = " + str(temperature_positive_integer) + "." + str(temperature_fraction) + " Â°C")
