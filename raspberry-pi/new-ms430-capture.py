@@ -69,7 +69,7 @@ while (True):
   print("Air quality index = {:.1f}".format(air_quality_data['AQI']))
   client.publish("sensors", "airquality,room=office-ms430 value=" + "{:.1f}".format(air_quality_data['AQI']))
   print("bVOC = {:.2f} ppm".format(air_quality_data['bVOC']))
-  client.publish("sensors", "airquality,room=office-ms430 value=" + "{:.1f}".format(air_quality_data['bVOC']))
+  client.publish("sensors", "bvoc,room=office-ms430 value=" + "{:.1f}".format(air_quality_data['bVOC']))
   print("Sound pressure = {:.1f} mPa".format(sound_data['peak_amp_mPa']))
   client.publish("sensors", "sound,room=office-ms430 value=" + "{:.1f}".format(sound_data['peak_amp_mPa']))
   print("Data sent to MQTT broker, " + str(brokerAddress) + ".")
