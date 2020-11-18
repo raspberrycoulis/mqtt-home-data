@@ -70,7 +70,7 @@ while (True):
   client.publish("sensors", "airquality,room=office-ms430 value=" + "{:.1f}".format(air_quality_data['AQI']))
   print("Breath VOC = {:.2f} ppm".format(air_quality_data['bVOC']))
   client.publish("sensors", "bvoc,room=office-ms430 value=" + "{:.2f}".format(air_quality_data['bVOC']))
-  print("Estimated CO2 = {:.2f} ppm".format(air_quality_data['bVOC']))
+  print("Estimated CO2 = {:.2f} %".format(air_quality_data['CO2e']))
   client.publish("sensors", "co2,room=office-ms430 value=" + "{:.2f}".format(air_quality_data['CO2e']))
   print("Peak amplitude = {:.1f} mPa".format(sound_data['peak_amp_mPa']))
   client.publish("sensors", "sound-peak-amp,room=office-ms430 value=" + "{:.1f}".format(sound_data['peak_amp_mPa']))
