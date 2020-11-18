@@ -56,9 +56,6 @@ while (True):
 
   # Get sound data
   sound_data = get_sound_data(I2C_bus)
-  #sound_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, SPL_READ, SPL_BYTES)
-  #sound_integer = sound_data[0]
-  #sound_fraction = sound_data[1]
 
   # Send data to MQTT
   client = mqtt.Client(clientName)
@@ -69,10 +66,10 @@ while (True):
   client.publish("sensors", "humidity,room=test-ms430 value=" + "{:.1f}".format(air_data['H_pc']))
   print("Lux = {:.2f} lux".format(light_data['illum_lux']))
   client.publish("sensors", "lux,room=test-ms340 value=" + "{:.2f}".format(light_data['illum_lux']))
+  print("Air quality index = {:.1f}".format(air_quality_data['AQI']))
+  client.publish("sensors", "airquality,room=test-ms340 value=" + "{:.1f}".format(air_quality_data['AQI']))
   print("Sound pressure = {:.1f} mPa".format(sound_data['peak_amp_mPa']))
   client.publish("sensors", "sound,room=test-ms340 value=" + "{:.1f}".format(sound_data['peak_amp_mPa']))
-  #print("Sound pressure = " + str(sound_integer) + "." + str(sound_fraction) + " dBA")
-  #client.publish("sensors", "sound,room=office-ms430 value=" + str(sound_integer) + "." + str(sound_fraction)) 
   #print("Data sent to MQTT broker, " + str(brokerAddress) + ".")
 
   if (particleSensor != PARTICLE_SENSOR_OFF):
