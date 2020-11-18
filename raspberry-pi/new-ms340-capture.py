@@ -66,7 +66,7 @@ while (True):
   client.publish("sensors", "humidity,room=test-ms430 value=" + "{:.1f}".format(air_data['H_pc']))
   print("Lux = {:.2f} lux".format(light_data['illum_lux']))
   client.publish("sensors", "lux,room=test-ms340 value=" + "{:.2f}".format(light_data['illum_lux']))
-  print("Air quality index = {:.1f}".format(air_quality_data['AQI']))
+  print("Air quality index = {:.1f}".format(air_quality_data['AQI']) +  :interpret_AQI_value(air_quality_data['AQI']))
   client.publish("sensors", "airquality,room=test-ms340 value=" + "{:.1f}".format(air_quality_data['AQI']))
   print("Sound pressure = {:.1f} mPa".format(sound_data['peak_amp_mPa']))
   client.publish("sensors", "sound,room=test-ms340 value=" + "{:.1f}".format(sound_data['peak_amp_mPa']))
