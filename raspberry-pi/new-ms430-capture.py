@@ -68,10 +68,14 @@ while (True):
   client.publish("sensors", "lux,room=office-ms430 value=" + "{:.2f}".format(light_data['illum_lux']))
   print("Air quality index = {:.1f}".format(air_quality_data['AQI']))
   client.publish("sensors", "airquality,room=office-ms430 value=" + "{:.1f}".format(air_quality_data['AQI']))
-  print("bVOC = {:.2f} ppm".format(air_quality_data['bVOC']))
-  client.publish("sensors", "bvoc,room=office-ms430 value=" + "{:.1f}".format(air_quality_data['bVOC']))
-  print("Sound pressure = {:.1f} mPa".format(sound_data['peak_amp_mPa']))
-  client.publish("sensors", "sound,room=office-ms430 value=" + "{:.1f}".format(sound_data['peak_amp_mPa']))
+  print("Breath VOC = {:.2f} ppm".format(air_quality_data['bVOC']))
+  client.publish("sensors", "bvoc,room=office-ms430 value=" + "{:.2f}".format(air_quality_data['bVOC']))
+  print("Estimated CO2 = {:.2f} ppm".format(air_quality_data['bVOC']))
+  client.publish("sensors", "co2,room=office-ms430 value=" + "{:.2f}".format(air_quality_data['CO2e']))
+  print("Peak amplitude = {:.1f} mPa".format(sound_data['peak_amp_mPa']))
+  client.publish("sensors", "sound-peak-amp,room=office-ms430 value=" + "{:.1f}".format(sound_data['peak_amp_mPa']))
+  print("A-weighted sound pressure = {:.1f} dBA".format(sound_data['SPL_dBA']))
+  client.publish("sensors", "sound-decibels,room=office-ms430 value=" + "{:.1f}".format(sound_data['SPL_dBA']))
   print("Data sent to MQTT broker, " + str(brokerAddress) + ".")
 
   if (particleSensor != PARTICLE_SENSOR_OFF):
