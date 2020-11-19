@@ -77,6 +77,8 @@ while (True):
   client.publish("sensors", "lux,room=office-ms430 value=" + "{:.2f}".format(light_data['illum_lux']))
   print("Air quality index = {:.1f}".format(air_quality_data['AQI']))
   client.publish("sensors", "airquality,room=office-ms430 value=" + "{:.1f}".format(air_quality_data['AQI']))
+  print("Air quality accuracy = " + str(air_quality_data['AQI_accuracy']) + "/3")
+  client.publish("sensors", "airquality-accuracy,room=office-ms430 value=" + str(air_quality_data['AQI_accuracy']))
   print("Breath VOC = {:.2f} ppm".format(air_quality_data['bVOC']))
   client.publish("sensors", "bvoc,room=office-ms430 value=" + "{:.2f}".format(air_quality_data['bVOC']))
   print("Estimated CO" + SUBSCRIPT_2 + " = {:.1f} ppm".format(air_quality_data['CO2e']))
