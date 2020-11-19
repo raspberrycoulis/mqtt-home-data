@@ -64,7 +64,7 @@ while (True):
   client.publish("sensors", "temperature,room=office-ms430 value=" + "{:.1f}".format(air_data['T']))
   print("Humidity = {:.1f} %".format(air_data['H_pc']))
   client.publish("sensors", "humidity,room=office-ms430 value=" + "{:.1f}".format(air_data['H_pc']))
-  print("Pressure = " + air_data['P_Pa'] + " Pa")
+  print("Pressure = " +str(air_data['P_Pa']) + " Pa")
   client.publish("sensors", "pressure,room=office-ms430 value=" + air_data['P_Pa'])
   print("Lux = {:.2f} lux".format(light_data['illum_lux']))
   client.publish("sensors", "lux,room=office-ms430 value=" + "{:.2f}".format(light_data['illum_lux']))
