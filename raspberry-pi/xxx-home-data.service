@@ -1,0 +1,15 @@
+[Unit]
+Description=XXX home data MQTT service
+After=multi-user.target
+
+[Service]
+User=pi
+Type=idle
+Restart=always
+RestartSec=10
+ExecStart=/home/pi/mqtt-home-data/raspberry-pi/xxx.py
+StandardOutput=journal+console
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target
