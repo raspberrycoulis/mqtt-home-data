@@ -4,6 +4,7 @@
 # This script will pull data from the BME280 sensor and send it to a MQTT broker.
 
 import time
+import datetime
 from envirophat import light, weather
 import paho.mqtt.client as mqtt
 
@@ -21,11 +22,14 @@ def run():
     if temperature is not None and pressure is not None and lux is not None:
         try:
             # Send data to MQTT
+            now = datetime.datetime.now()
             client = mqtt.Client(clientName)
             client.connect(brokerAddress)
             client.publish("sensors", "temp,room=office-enviro value=" +str(temperature))
             client.publish("sensors", "pressure,room=office-enviro value=" +str(pressure))
             client.publish("sensors", "lux,room=office-enviro value=" +str(lux))
+            print("Data sent at: " +(now.strftime("%H:%M:%S on %d/%m/%Y")))
+            sys.stdout.flush()
         except Exception:
           # Process exception here
           print ("Error while sending to MQTT broker")
