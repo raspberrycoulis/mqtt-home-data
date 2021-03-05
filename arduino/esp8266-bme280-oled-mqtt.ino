@@ -17,6 +17,7 @@ const char* password = "ADD_HERE";
 const char* mqtt_server = "192.168.1.24";
 const char* channel = "sensors";
 const char* room = "ADD_HERE";
+const char* floor = "ADD_HERE";
 WiFiClient espClient;
 PubSubClient client(espClient);
 
@@ -96,7 +97,7 @@ void handleTemperature() {
   display.drawString(64, 25, String(temperature, 2) + "°C");
   display.display();
   //String v1 = ("temperature,room=living-room value=" + String(temperature));
-  String v1 = ("temperature,room=" + String(room) + " value=" + String(temperature)); // Variable room name test
+  String v1 = ("temperature,room=" + String(room) + ",floor=" + String(floor) + " value=" + String(temperature)); // Variable room name test
   client.publish(channel, v1.c_str(), true);
   Serial.println("Temperature sent to MQTT server...");
 }
@@ -111,7 +112,7 @@ void handleHumidity() {
   display.drawString(64, 25, String(humidity, 2) + "% RH");
   display.display();
   //String v2 = ("humidity,room=living-room value=" + String(humidity));
-  String v2 = ("humidity,room=" + String(room) + " value=" + String(humidity)); // Variable room name test
+  String v2 = ("humidity,room=" + String(room) + ",floor=" + String(floor) + " value=" + String(humidity)); // Variable room name test
   client.publish(channel, v2.c_str(), true);
   Serial.println("Humidity sent to MQTT server...");
 }
@@ -126,7 +127,7 @@ void handlePressure() {
   display.drawString(64, 25, String(pressure, 2) + "hPa");
   display.display();
   //String v3 = ("pressure,room=living-room value=" + String(pressure));
-  String v3 = ("pressure,room=" + String(room) + " value=" + String(pressure)); // Variable room name test
+  String v3 = ("pressure,room=" + String(room) + ",floor=" + String(floor) + " value=" + String(pressure)); // Variable room name test
   client.publish(channel, v3.c_str(), true);
   Serial.println("Pressure sent to MQTT server...");
 }
