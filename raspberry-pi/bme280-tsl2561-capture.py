@@ -45,7 +45,7 @@ def run():
             client.publish("sensors", "temperature,room=living-room-bme280,floor=downstairs value=" +str(temperature))
             client.publish("sensors", "humidity,room=living-room-bme280,floor=downstairs value=" +str(humidity))
             client.publish("sensors", "pressure,room=living-room-bme280,floor=downstairs value=" +str(pressure))
-            client.publish("sensors", "lux,room=living-room-tsl2561 value=" +str(lux))
+            client.publish("sensors", "lux,room=living-room-tsl2561,floor=downstairs value=" +str(lux))
         except Exception:
           # Process exception here
           print ("Error while sending to MQTT broker")
