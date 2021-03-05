@@ -25,9 +25,9 @@ def run():
             # Send data to MQTT
             client = mqtt.Client(clientName)
             client.connect(brokerAddress)
-            client.publish("sensors", "temperature,room=living-room-bme280 value=" +str(temperature))
-            client.publish("sensors", "humidity,room=living-room-bme280 value=" +str(humidity))
-            client.publish("sensors", "pressure,room=living-room-bme280 value=" +str(pressure))
+            client.publish("sensors", "temperature,room=living-room-bme280,floor=downstairs value=" +str(temperature))
+            client.publish("sensors", "humidity,room=living-room-bme280,floor=downstairs value=" +str(humidity))
+            client.publish("sensors", "pressure,room=living-room-bme280,floor=downstairs value=" +str(pressure))
         except Exception:
           # Process exception here
           print ("Error while sending to MQTT broker")

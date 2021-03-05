@@ -26,9 +26,9 @@ def run():
             now = datetime.datetime.now()
             client = mqtt.Client(clientName)
             client.connect(brokerAddress)
-            client.publish("sensors", "temperature,room=office-enviro value=" +str(temperature))
-            client.publish("sensors", "pressure,room=office-enviro value=" +str(pressure))
-            client.publish("sensors", "lux,room=office-enviro value=" +str(lux))
+            client.publish("sensors", "temperature,room=office-enviro,floor=downstairs value=" +str(temperature))
+            client.publish("sensors", "pressure,room=office-enviro,floor=downstairs value=" +str(pressure))
+            client.publish("sensors", "lux,room=office-enviro,floor=downstairs value=" +str(lux))
             print("Data sent at: " +(now.strftime("%H:%M:%S on %d/%m/%Y")))
             sys.stdout.flush()
         except Exception:
