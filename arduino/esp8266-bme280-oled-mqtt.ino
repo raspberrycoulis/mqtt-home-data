@@ -95,8 +95,8 @@ void handleTemperature() {
   display.setFont(ArialMT_Plain_24);
   display.drawString(64, 25, String(temperature, 2) + "°C");
   display.display();
-  //String v1 = ("temp,room=living-room value=" + String(temperature));
-  String v1 = ("temp,room=" + String(room) + " value=" + String(temperature)); // Variable room name test
+  //String v1 = ("temperature,room=living-room value=" + String(temperature));
+  String v1 = ("temperature,room=" + String(room) + " value=" + String(temperature)); // Variable room name test
   client.publish(channel, v1.c_str(), true);
   Serial.println("Temperature sent to MQTT server...");
 }

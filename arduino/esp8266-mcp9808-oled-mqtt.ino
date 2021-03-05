@@ -88,7 +88,7 @@ void loop() {
   display.drawString(64, 25, String(c, 2) + "°C");
   display.display();
   Serial.println("");
-  String v1 = ("temp,room=living-room value=" + String(c));
+  String v1 = ("temperature,room=living-room value=" + String(c));
   client.publish(channel, v1.c_str(), true);
   Serial.println("Data sent to MQTT server...");
   delay(15000);
