@@ -13,14 +13,25 @@ Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
 // WiFi credentials
 const char* ssid = "ADD_HERE";
 const char* password = "ADD_HERE";
-const char* mqtt_server = "192.168.1.24";
+
+// Static IP address
+IPAddress ip(192, 168, 1, 42); // Uses commas, not points!
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
+IPAddress primary_dns(192, 168, 1, 254);
+IPAddress secondary_dns(1, 1, 1, 1);
+
+// MQTT credentials
+const char* mqtt_server = "192.168.1.24"; // Okay to use points now...
 const char* channel = "sensors";
+const char* floor = "downstairs";
 WiFiClient espClient;
 PubSubClient client(espClient);
 
 void setup() {
   delay(1000);
   Serial.begin(115200);
+  WiFi.config(ip, gateway, subnet, primary_dns, secondary_dns);
   WiFi.begin(ssid, password);
   while (!Serial); // waits for serial terminal to be open, necessary in newer Arduino boards.
   Serial.print("Connecting to WiFi");
@@ -88,7 +99,7 @@ void loop() {
   display.drawString(64, 25, String(c, 2) + "°C");
   display.display();
   Serial.println("");
-  String v1 = ("temperature,room=living-room,floor=downstairs value=" + String(c));
+  String v1 = ("temperature,room=" + String(room) + ",floor=" + String(floor) + " value=" + String(c));
   client.publish(channel, v1.c_str(), true);
   Serial.println("Data sent to MQTT server...");
   delay(15000);

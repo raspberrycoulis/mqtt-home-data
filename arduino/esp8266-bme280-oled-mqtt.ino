@@ -14,6 +14,15 @@ Adafruit_BME280 bme; // I2C
 // WiFi credentials
 const char* ssid = "ADD_HERE";
 const char* password = "ADD_HERE";
+
+// Static IP address
+IPAddress ip(192, 168, 1, 42); // Uses commas, not points!
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
+IPAddress primary_dns(192, 168, 1, 254);
+IPAddress secondary_dns(1, 1, 1, 1);
+
+// MQTT details
 const char* mqtt_server = "192.168.1.24";
 const char* channel = "sensors";
 const char* room = "ADD_HERE";
@@ -33,6 +42,7 @@ void setup() {
     while (1);
   }
   
+  WiFi.config(ip, gateway, subnet, primary_dna, secondary_dns);
   WiFi.begin(ssid, password);
   while (!Serial); // waits for serial terminal to be open, necessary in newer Arduino boards.
   Serial.print("Connecting to WiFi");
