@@ -42,7 +42,7 @@ void setup() {
     while (1);
   }
   
-  WiFi.config(ip, gateway, subnet, primary_dna, secondary_dns);
+  WiFi.config(ip, gateway, subnet, primary_dns, secondary_dns);
   WiFi.begin(ssid, password);
   while (!Serial); // waits for serial terminal to be open, necessary in newer Arduino boards.
   Serial.print("Connecting to WiFi");
