@@ -1,13 +1,13 @@
 #include <ESP8266WiFi.h>  // To connect to WiFi
-#include <Adafruit_TSL2561_U.h> // TSL2561 sensor library
+#include "Adafruit_MCP9808.h" // MCP9808 temperature sensor
 #include <PubSubClient.h>  // MQTT client library
 
 long SLEEPTIME = 600e6; // 10min
 const char* ssid = "ADD_HERE";
 const char* password = "ADD_HERE";
 
-// Initialise the TSL2561 sensor
-Adafruit_TSL2561_Unified tsl = Adafruit_TSL2561_Unified(TSL2561_ADDR_FLOAT, 12345);
+// Initialise the MCP9808 sensor
+Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
 
 // We make a structure to store connection information
 // The ESP8266 RTC memory is arranged into blocks of 4 bytes. The access methods read and write 4 bytes at a time,
@@ -34,27 +34,6 @@ const char* room = "ADD_HERE";
 WiFiClient espClient;
 PubSubClient client(espClient);
 
-// Configure the TSL2651 sensor
-void configureSensor(void)
-{
-  /* You can also manually set the gain or enable auto-gain support */
-  // tsl.setGain(TSL2561_GAIN_1X);      /* No gain ... use in bright light to avoid sensor saturation */
-  // tsl.setGain(TSL2561_GAIN_16X);     /* 16x gain ... use in low light to boost sensitivity */
-  tsl.enableAutoRange(true);            /* Auto-gain ... switches automatically between 1x and 16x */
-  
-  /* Changing the integration time gives you better sensor resolution (402ms = 16-bit data) */
-  //tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_13MS);      /* fast but low resolution */
-  //tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_101MS);  /* medium resolution and speed   */
-  tsl.setIntegrationTime(TSL2561_INTEGRATIONTIME_402MS);  /* 16-bit data but slowest conversions */
-
-  /* Update these values depending on what you've set above! */  
-  Serial.println("------------------------------------");
-  Serial.print  ("Gain:         "); Serial.println("Auto");
-  Serial.print  ("Timing:       "); Serial.println("402 ms");
-  Serial.println("------------------------------------");
-}
-
-
 void setup() {
   delay(1000);
   Serial.begin(115200);
@@ -74,7 +53,7 @@ void setup() {
     }
   }
   // Start connection WiFi
-  //Switch Radio back On
+  // Switch Radio back On
   WiFi.forceSleepWake();
   delay(1);
 
@@ -133,17 +112,18 @@ void setup() {
   ESP.rtcUserMemoryWrite(0, (uint32_t*)&rtcData, sizeof(rtcData));
   client.setServer(mqtt_server, 1883);
   Serial.println("Connected to MQTT server: " + String(mqtt_server));
-  Serial.println("Initialising TSL2561 sensor...");
-  /* Initialise the sensor */
-  //use tsl.begin() to default to Wire, 
-  //tsl.begin(&Wire2) directs api to use Wire2, etc.
-  if(!tsl.begin())
-  {
-    Serial.print("Ooops, no TSL2561 detected ... Check your wiring or I2C ADDR!");
-    while(1);
+  Serial.println("Initialising MCP9808 sensor...");
+  if (!tempsensor.begin(0x18)) {
+    Serial.println("Couldn't find the MCP9808 sensor! Check the connections and that the I2C address is correct.");
+    while (1);
   }
-  Serial.println("Found TSL2561 sensor!");
-  configureSensor();
+  Serial.println("Found MCP9808!");
+  // Mode Resolution SampleTime
+  //  0    0.5°C       30 ms
+  //  1    0.25°C      65 ms
+  //  2    0.125°C     130 ms
+  //  3    0.0625°C    250 ms
+  tempsensor.setResolution(3); // sets the resolution of the reading:
   Serial.println("Start sending data...");
   sendMQTTmessage();
   Serial.println("Going back to sleep...");
@@ -163,12 +143,12 @@ void sendMQTTmessage()
   if (!client.connected()) {
     reconnect();
   }
-  sensors_event_t event;  // TSL2561
-  tsl.getEvent(&event);   // TSL2561
-  Serial.print("Light: ");
-  Serial.print(event.light, 4); Serial.print(" lux\t.");
+  //float c = tempsensor.readTempC(); // Use if sensor is not in a case
+  float c = tempsensor.readTempC() - 4.6; // Calibrated value for sensor if housed in a case
+  Serial.print("Temp: ");
+  Serial.print(c, 4); Serial.print("°C\t.");
   Serial.println("");
-  String v1 = ("lux,room=" + String(room) + ",floor=" + String(level) + " value=" + String(event.light));
+  String v1 = ("temperature,room=" + String(room) + ",floor=" + String(level) + " value=" + String(c));
   client.publish(channel, v1.c_str(), true);
   Serial.println("Data sent to MQTT server!");
   client.disconnect();
