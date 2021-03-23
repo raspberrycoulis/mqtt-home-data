@@ -2,7 +2,7 @@
 #include <Adafruit_TSL2561_U.h> // TSL2561 sensor library
 #include <PubSubClient.h>  // MQTT client library
 
-long SLEEPTIME = 600e6; //10min
+long SLEEPTIME = 600e6; // 10min
 const char* ssid = "ADD_HERE";
 const char* password = "ADD_HERE";
 
@@ -30,7 +30,7 @@ IPAddress secondary_dns(1, 1, 1, 1);
 const char* mqtt_server = "192.168.1.24"; // Okay to use points now...
 const char* channel = "sensors";
 const char* level = "downstairs";
-const char* room = "living-room";
+const char* room = "ADD_HERE";
 WiFiClient espClient;
 PubSubClient client(espClient);
 
