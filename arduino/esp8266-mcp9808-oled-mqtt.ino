@@ -91,7 +91,7 @@ void loop() {
   display.clear();
   display.setTextAlignment(TEXT_ALIGN_CENTER);
   //float c = tempsensor.readTempC(); // Use if sensor is not in a case
-  float c = tempsensor.readTempC() - 2.193; // Calibrated value for sensor if housed in a case
+  float c = tempsensor.readTempC() - 4.6; // Calibrated value for sensor if housed in a case
   Serial.print("Temp: ");
   Serial.print(c, 4); Serial.print("°C\t.");
   display.setFont(ArialMT_Plain_10);
