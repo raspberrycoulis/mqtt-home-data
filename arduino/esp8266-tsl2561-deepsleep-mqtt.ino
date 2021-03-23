@@ -181,10 +181,10 @@ void reconnect() {
     ClientId += String(random(0xffff), HEX);
     if (client.connect(ClientId.c_str()))
     {
-      Serial.print("Connected");
+      Serial.println("Connected");
     } else {
-      Serial.print("Failed, rc= ");
-      Serial.print(client.state());
+      Serial.println("Failed, rc= ");
+      Serial.println(client.state());
       delay(1000);
     }
 
