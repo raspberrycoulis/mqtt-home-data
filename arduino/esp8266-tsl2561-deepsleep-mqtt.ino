@@ -34,6 +34,11 @@ const char* room = "ADD_HERE";
 WiFiClient espClient;
 PubSubClient client(espClient);
 
+// For battery voltage reporting
+unsigned int batt;
+ADC_MODE(ADC_VCC);
+
+
 // Configure the TSL2651 sensor
 void configureSensor(void)
 {
@@ -73,6 +78,11 @@ void setup() {
       rtcValid = true;
     }
   }
+  // Report the battery level in the serial console
+  batt = ESP.getVcc();
+  Serial.print("Battery Voltage ");
+  Serial.println(batt/1023.0F);
+
   // Start connection WiFi
   //Switch Radio back On
   WiFi.forceSleepWake();
@@ -169,7 +179,9 @@ void sendMQTTmessage()
   Serial.print(event.light, 4); Serial.print(" lux\t.");
   Serial.println("");
   String v1 = ("lux,room=" + String(room) + ",floor=" + String(level) + " value=" + String(event.light));
+  String v2 = ("battery,room=" + String(room) + ",floor=" + String(level) + " value=" + String(batt / 1023.0F));
   client.publish(channel, v1.c_str(), true);
+  client.publish(channel, v2.c_str(), true);  
   Serial.println("Data sent to MQTT server!");
   client.disconnect();
 }

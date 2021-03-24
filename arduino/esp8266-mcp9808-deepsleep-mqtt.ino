@@ -34,6 +34,11 @@ const char* room = "ADD_HERE";
 WiFiClient espClient;
 PubSubClient client(espClient);
 
+// For battery voltage reporting
+unsigned int batt;
+ADC_MODE(ADC_VCC);
+
+
 void setup() {
   delay(1000);
   Serial.begin(115200);
@@ -52,7 +57,12 @@ void setup() {
       rtcValid = true;
     }
   }
-  // Start connection WiFi
+  // Report the battery level in the serial console
+  batt = ESP.getVcc();
+  Serial.print("Battery Voltage ");
+  Serial.println(batt/1023.0F);
+
+    // Start connection WiFi
   // Switch Radio back On
   WiFi.forceSleepWake();
   delay(1);
@@ -149,7 +159,9 @@ void sendMQTTmessage()
   Serial.print(c, 4); Serial.print("°C\t.");
   Serial.println("");
   String v1 = ("temperature,room=" + String(room) + ",floor=" + String(level) + " value=" + String(c));
+  String v2 = ("battery,room=" + String(room) + ",floor=" + String(level) + " value=" + String(batt / 1023.0F));
   client.publish(channel, v1.c_str(), true);
+  client.publish(channel, v2.c_str(), true);
   Serial.println("Data sent to MQTT server!");
   client.disconnect();
 }
