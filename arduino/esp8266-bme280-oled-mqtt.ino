@@ -33,15 +33,6 @@ PubSubClient client(espClient);
 void setup() {
   delay(1000);
   Serial.begin(115200);
-
-  // initialize BME280 sensor
-  bool status;
-  status = bme.begin(0x76);  
-  if (!status) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    while (1);
-  }
-  
   WiFi.config(ip, gateway, subnet, primary_dns, secondary_dns);
   WiFi.begin(ssid, password);
   while (!Serial); // waits for serial terminal to be open, necessary in newer Arduino boards.
@@ -57,26 +48,30 @@ void setup() {
   Serial.println("Connected to MQTT server: " + String(mqtt_server));
   Serial.println("");
   Serial.println("Initialising BME280 sensor...");
+  // initialize BME280 sensor
+  bool status;
+  status = bme.begin(0x76);  
+  if (!status) {
+    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+    while (1);
+  }
+  Serial.println("Found BME280!");
   Serial.println("Initializing OLED display...");
   display.init();
   display.flipScreenVertically();
-  Serial.println("Found BME280!");
 }
 void reconnect() {
-  // Loop until we're reconnected
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Create a random client ID
     String clientId = "ESP8266Client-";
     clientId += String(random(0xffff), HEX);
-    // Attempt to connect
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
-      // Wait 5 seconds before retrying
       delay(5000);
     }
   }
@@ -106,8 +101,7 @@ void handleTemperature() {
   display.setFont(ArialMT_Plain_24);
   display.drawString(64, 25, String(temperature, 2) + "°C");
   display.display();
-  //String v1 = ("temperature,room=living-room value=" + String(temperature));
-  String v1 = ("temperature,room=" + String(room) + ",floor=" + String(level) + " value=" + String(temperature)); // Variable room name test
+  String v1 = ("temperature,room=" + String(room) + ",floor=" + String(level) + " value=" + String(temperature));
   client.publish(channel, v1.c_str(), true);
   Serial.println("Temperature sent to MQTT server...");
 }
@@ -121,8 +115,7 @@ void handleHumidity() {
   display.setFont(ArialMT_Plain_24);
   display.drawString(64, 25, String(humidity, 2) + "% RH");
   display.display();
-  //String v2 = ("humidity,room=living-room value=" + String(humidity));
-  String v2 = ("humidity,room=" + String(room) + ",floor=" + String(level) + " value=" + String(humidity)); // Variable room name test
+  String v2 = ("humidity,room=" + String(room) + ",floor=" + String(level) + " value=" + String(humidity));
   client.publish(channel, v2.c_str(), true);
   Serial.println("Humidity sent to MQTT server...");
 }
@@ -136,8 +129,7 @@ void handlePressure() {
   display.setFont(ArialMT_Plain_24);
   display.drawString(64, 25, String(pressure, 2) + "hPa");
   display.display();
-  //String v3 = ("pressure,room=living-room value=" + String(pressure));
-  String v3 = ("pressure,room=" + String(room) + ",floor=" + String(level) + " value=" + String(pressure)); // Variable room name test
+  String v3 = ("pressure,room=" + String(room) + ",floor=" + String(level) + " value=" + String(pressure));
   client.publish(channel, v3.c_str(), true);
   Serial.println("Pressure sent to MQTT server...");
 }
