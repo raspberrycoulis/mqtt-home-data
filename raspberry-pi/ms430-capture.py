@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from sensor_functions import *
+from new_sensor_functions import *
 import paho.mqtt.client as mqtt
 import time
+import datetime
 
 #########################################################
 # USER-EDITABLE SETTINGS
@@ -22,6 +23,8 @@ print_data_as_columns = False
 # MQTT details
 brokerAddress = "192.168.1.24"  # Update accordingly
 clientName = "MS430-Pi"         # Update accordingly
+room = "office-ms430"            # Update accordingly
+zone = "upstairs"               # Update accordingly
 
 # END OF USER-EDITABLE SETTINGS
 #########################################################
@@ -29,10 +32,16 @@ clientName = "MS430-Pi"         # Update accordingly
 # Set up the GPIO and I2C communications bus
 (GPIO, I2C_bus) = SensorHardwareSetup()
 
-# Apply the chosen settings
-if (particleSensor != PARTICLE_SENSOR_OFF):
-  I2C_bus.write_i2c_block_data(i2c_7bit_address, PARTICLE_SENSOR_SELECT_REG, [particleSensor])
+# Apply the chosen settings to the MS430
+I2C_bus.write_i2c_block_data(i2c_7bit_address, PARTICLE_SENSOR_SELECT_REG, [PARTICLE_SENSOR])
 I2C_bus.write_i2c_block_data(i2c_7bit_address, CYCLE_TIME_PERIOD_REG, [cycle_period])
+
+# Unicode symbol strings
+CELSIUS_SYMBOL = "\u00B0C"
+FAHRENHEIT_SYMBOL = "\u00B0F"
+SDS011_CONC_SYMBOL = "\u00B5g/m\u00B3" # micrograms per cubic meter
+SUBSCRIPT_2 = "\u2082"
+OHM_SYMBOL = "\u03A9"
 
 #########################################################
 
@@ -40,74 +49,87 @@ print("Entering cycle mode and waiting for data. Press ctrl-c to exit.")
 
 I2C_bus.write_byte(i2c_7bit_address, CYCLE_MODE_CMD)
 
+# For MQTT connections
+def on_disconnect(client, userdata, rc):
+    if rc!=0:
+      print("MQTT disconnected. Will auto-reconnect...")
+      sys.stdout.flush()
+
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        client.connected_flag = True
+        print("Connected to MQTT broker as {}.".format(clientName))
+        sys.stdout.flush()
+    else:
+        print("Connection error! Result code: {}".format(rc))
+        sys.stdout.flush()
+
+mqtt.Client.connected_flag = False
+client = mqtt.Client(clientName)
+client.on_connect = on_connect
+client.on_disconnect = on_disconnect
+client.loop_start()
+client.connect(brokerAddress)
+while not client.connected_flag:
+    print("Connecting...")
+    time.sleep(1)
+
 while (True):
+  try:
+    # Get the time
+    now = datetime.datetime.now()
+    # Wait for the next new data release, indicated by a falling edge on READY
+    while (not GPIO.event_detected(READY_pin)):
+      sleep(0.05)
 
-  # Wait for the next new data release, indicated by a falling edge on READY
-  while (not GPIO.event_detected(READY_pin)):
-    sleep(0.05)
+    # Temperature and humidity data
+    air_data = get_air_data(I2C_bus)
 
-  # Humidity data
-  humidity_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, H_READ, H_BYTES)
-  humidity_integer = humidity_data[0]
-  humidity_fraction = humidity_data[1]
+    # Get air quality data
+    air_quality_data = get_air_quality_data(I2C_bus)
 
-  # Temperature data
-  temperature_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, T_READ, T_BYTES)
-  temperature_positive_integer = temperature_data[0] & TEMPERATURE_VALUE_MASK
-  temperature_fraction = temperature_data[1]
+    # Get light data
+    light_data = get_light_data(I2C_bus)
 
-  # Gas sensor data - not working reliably
-  #gas_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, G_READ, G_BYTES)
-  #gas_integer = gas_data[0]
+    # Get sound data
+    sound_data = get_sound_data(I2C_bus)
 
-  # Air quality data - not working reliably
-  #aq_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, AQI_READ, AQI_BYTES)
-  #aq_integer_lsb = aq_data[0]
-  #aq_integer_msb = aq_data[1]
-  #aq_fraction = aq_data[2]
+    # Send data to MQTT
+    print("Temperature = {:.1f} ".format(air_data['T_C']) + air_data['C_unit'])
+    client.publish("sensors", "temperature,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.1f}".format(air_data['T']))
+    print("Humidity = {:.1f} %".format(air_data['H_pc']))
+    client.publish("sensors", "humidity,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.1f}".format(air_data['H_pc']))
+    print("Pressure = " + str(air_data['P_Pa']/100) + " hPa")
+    client.publish("sensors", "pressure,room=" + str(room) + ",floor=" + str(zone) + " value=" + str(air_data['P_Pa']/100))
+    print("Lux = {:.2f} lux".format(light_data['illum_lux']))
+    client.publish("sensors", "lux,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.2f}".format(light_data['illum_lux']))
+    print("Air quality index = {:.1f}".format(air_quality_data['AQI']))
+    client.publish("sensors", "airquality,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.1f}".format(air_quality_data['AQI']))
+    print("Air quality accuracy = " + str(air_quality_data['AQI_accuracy']) + "/3")
+    client.publish("sensors", "airquality-accuracy,room=" + str(room) + ",floor=" + str(zone) + " value=" + str(air_quality_data['AQI_accuracy']))
+    print("Breath VOC = {:.2f} ppm".format(air_quality_data['bVOC']))
+    client.publish("sensors", "bvoc,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.2f}".format(air_quality_data['bVOC']))
+    print("Estimated CO" + SUBSCRIPT_2 + " = {:.1f} ppm".format(air_quality_data['CO2e']))
+    client.publish("sensors", "co2,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.1f}".format(air_quality_data['CO2e']))
+    print("Gas sensor resistance = " + str(air_data['G_ohm']) + " " + OHM_SYMBOL)
+    client.publish("sensors", "gas-resistance,room=" + str(room) + ",floor=" + str(zone) + " value=" + str(air_data['G_ohm']))
+    print("Peak amplitude = {:.2f} mPa".format(sound_data['peak_amp_mPa']))
+    client.publish("sensors", "sound-peak-amp,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.2f}".format(sound_data['peak_amp_mPa']))
+    print("A-weighted sound pressure = {:.1f} dBA".format(sound_data['SPL_dBA']))
+    client.publish("sensors", "sound-decibels,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.1f}".format(sound_data['SPL_dBA']))
+    print("Data sent to MQTT broker " + str(brokerAddress) + " at " + (now.strftime("%H:%M:%S on %d/%m/%Y")))
+    time.sleep(60)
 
-  # Illuminance data
-  lux_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, ILLUMINANCE_READ, ILLUMINANCE_BYTES)
-  lux_integer_lsb = lux_data[0]
-  lux_integer_msb = lux_data[1]
-  lux_fraction = lux_data[2]
+    if (particleSensor != PARTICLE_SENSOR_OFF):
+      raw_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, PARTICLE_DATA_READ, PARTICLE_DATA_BYTES)
+      particle_data = extractParticleData(raw_data, particleSensor)
+      writeParticleData(None, particle_data, print_data_as_columns)
 
-  # White light data - not really that useful
-  #light_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, WHITE_LIGHT_READ, WHITE_BYTES)
-  #white_light = light_data[0]
-
-  # Sound data
-  sound_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, SPL_READ, SPL_BYTES)
-  sound_integer = sound_data[0]
-  sound_fraction = sound_data[1]
-
-  # Send data to MQTT
-  client = mqtt.Client(clientName)
-  client.connect(brokerAddress)
-  print("Humidity = " + str(humidity_integer) + "." + str(humidity_fraction) + " %")
-  client.publish("sensors", "humidity,room=office-ms430 value=" + str(humidity_integer) + "." + str(humidity_fraction))
-  print("Temperature = " + str(temperature_positive_integer) + "." + str(temperature_fraction) + " °C")
-  client.publish("sensors", "temperature,room=office-ms430 value=" + str(temperature_positive_integer) + "." + str(temperature_fraction))
-  #print("Lux = " + str(lux_integer_lsb) + str(lux_integer_msb) + "." + str(lux_fraction) + " lux") # Was giving incorrect reading
-  print("Lux = " + str(lux_integer_lsb) + "." + str(lux_fraction) + " lux")
-  #client.publish("sensors", "lux,room=office-ms430 value=" + str(lux_integer_lsb) + str(lux_integer_msb) + "." + str(lux_fraction)) # Was giving incorrect reading
-  client.publish("sensors", "lux,room=office-ms430 value=" + str(lux_integer_lsb) + "." + str(lux_fraction))
-  #print("Gas resistance = " + str(gas_integer) + " ohm")
-  #client.publish("sensors", "gas-resistance,room=office-ms430 value=" + str(gas_integer))
-  #print("Air quality index = " + str(aq_integer_lsb) + str(aq_integer_msb) + "." + str(aq_fraction))
-  #client.publish("sensors", "air-qual,room=office-ms430 value=" + str(aq_integer_lsb) + str(aq_integer_msb) + "." + str(aq_fraction))
-  #print("White light = " + str(white_light))
-  #client.publish("sensors", "white-light,room=office-ms430 value=" + str(white_light))
-  print("Sound pressure = " + str(sound_integer) + "." + str(sound_fraction) + " dBA")
-  client.publish("sensors", "sound,room=office-ms430 value=" + str(sound_integer) + "." + str(sound_fraction)) 
-  print("Data sent to MQTT broker, " + str(brokerAddress) + ".")
-
-  if (particleSensor != PARTICLE_SENSOR_OFF):
-    raw_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, PARTICLE_DATA_READ, PARTICLE_DATA_BYTES)
-    particle_data = extractParticleData(raw_data, particleSensor)
-    writeParticleData(None, particle_data, print_data_as_columns)
-
-  if print_data_as_columns:
-    print("")
-  else:
-    print("-------------------------------------------")
+    if print_data_as_columns:
+      print("")
+    else:
+      print("-------------------------------------------")
+  
+  except (KeyboardInterrupt, SystemExit):
+    sys.exit("Goodbye!")
+    pass
