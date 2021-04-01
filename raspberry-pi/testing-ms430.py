@@ -3,6 +3,7 @@
 from new_sensor_functions import *
 import paho.mqtt.client as mqtt
 import time
+import datatime
 
 #########################################################
 # USER-EDITABLE SETTINGS
@@ -75,6 +76,8 @@ while not client.connected_flag:
 
 while (True):
   try:
+    # Get the time
+    now = datetime.datetime.now()
     # Wait for the next new data release, indicated by a falling edge on READY
     while (not GPIO.event_detected(READY_pin)):
       sleep(0.05)
@@ -114,7 +117,7 @@ while (True):
     client.publish("sensors", "sound-peak-amp,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.2f}".format(sound_data['peak_amp_mPa']))
     print("A-weighted sound pressure = {:.1f} dBA".format(sound_data['SPL_dBA']))
     client.publish("sensors", "sound-decibels,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.1f}".format(sound_data['SPL_dBA']))
-    print("Data sent to MQTT broker, " + str(brokerAddress) + ".")
+    print("Data sent to MQTT broker " + str(brokerAddress) + " at " + (now.strftime("%H:%M:%S on %d/%m/%Y")))
     time.sleep(60)
 
     if (particleSensor != PARTICLE_SENSOR_OFF):
