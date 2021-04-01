@@ -103,6 +103,6 @@ void loop() {
   String v1 = ("temperature,room=" + String(room) + ",floor=" + String(level) + " value=" + String(c));
   client.publish(channel, v1.c_str(), true);
   Serial.println("Data sent to MQTT server...");
-  delay(15000);
+  delay(60000);
 }
 //=========================================================================

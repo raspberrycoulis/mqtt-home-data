@@ -117,4 +117,5 @@ void loop() {
   client.publish(channel, v2.c_str(), true);
   client.publish(channel, v3.c_str(), true);
   Serial.print("Temperature, humidity and pressure data sent to MQTT server!");
+  delay(60000);
 }
