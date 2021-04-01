@@ -3,7 +3,7 @@
 from new_sensor_functions import *
 import paho.mqtt.client as mqtt
 import time
-import datatime
+import datetime
 
 #########################################################
 # USER-EDITABLE SETTINGS
