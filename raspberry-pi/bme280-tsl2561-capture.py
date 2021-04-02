@@ -78,8 +78,10 @@ while True:
             except Exception:
                 # Process exception here
                 print ("Error while sending to MQTT broker")
+                sys.stdout.flush()
             else:
                 print("Data sent to MQTT broker " + str(brokerAddress) + " at " + (now.strftime("%H:%M:%S on %d/%m/%Y")))
+                sys.stdout.flush()
 
         # Sleep some time
         time.sleep(period)
