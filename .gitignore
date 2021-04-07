@@ -49,4 +49,6 @@ Thumbs.db
 *.wmv
 
 # VS Code preferences
+.vscode/
 .vscode/c_cpp_properties.json
+.vscode/arduino.json
