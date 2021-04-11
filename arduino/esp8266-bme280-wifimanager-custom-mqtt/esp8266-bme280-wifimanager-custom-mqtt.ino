@@ -20,7 +20,9 @@ Ticker ticker;
 int LED = LED_BUILTIN;
 
 // Configure the BME280 sensor
+#define SEALEVELPRESSURE_HPA (1023.00)
 Adafruit_BME280 bme; // I2C
+
 
 // Static IP address
 char static_ip[16] = "192.168.1.148";
@@ -32,6 +34,7 @@ char mqtt_server[40] = "192.168.1.24";
 char channel[10] = "sensors";
 char level[10] = "upstairs";
 char room[20] = "dev";
+char temp_calibration[6] = "5.57";
 WiFiClient espClient;
 PubSubClient client(espClient);
 
@@ -86,6 +89,7 @@ void setupSpiffs(){
           strcpy(channel, json["channel"]);
           strcpy(level, json["level"]);
           strcpy(room, json["room"]);
+          strcpy(temp_calibration, json["temp_calibration"]);
 
           if(json["ip"]) {
             Serial.println("Setting custom IP from config");
@@ -120,11 +124,13 @@ void setup() {
   WiFiManagerParameter custom_channel("channel", "MQTT channel", channel, 10);
   WiFiManagerParameter custom_level("level", "Floor in house", level, 10);
   WiFiManagerParameter custom_room("room", "Room in house", room, 20);
+  WiFiManagerParameter custom_temp_calibration("temp_calibration", "Temperature calibration", temp_calibration, 6);
   wm.setSaveConfigCallback(saveConfigCallback);
   wm.addParameter(&custom_mqtt_server);
   wm.addParameter(&custom_channel);
   wm.addParameter(&custom_level);
   wm.addParameter(&custom_room);
+  wm.addParameter(&custom_temp_calibration);
   // Set static IP address
   IPAddress _ip,_gateway,_subnet;
   _ip.fromString(static_ip);
@@ -147,6 +153,7 @@ void setup() {
   strcpy(channel, custom_channel.getValue());
   strcpy(level, custom_level.getValue());
   strcpy(room, custom_room.getValue());
+  strcpy(temp_calibration, custom_temp_calibration.getValue());
   // Save the custom parameters to file system
   if (shouldSaveConfig) {
     Serial.println("Saving config...");
@@ -203,22 +210,30 @@ void loop() {
   if (!client.connected()) {
     reconnect();
   }
-  //float temperature = bme.readTemperature() - 2.193; // Calibrated value for sensor if housed in a case
-  float temperature = bme.readTemperature();
+  char* tc = temp_calibration;
+  char temp_calib_alt = (char)atoi(tc);
+  float temp_calib = (float)temp_calib_alt;
+  float temperature = bme.readTemperature() - temp_calib; // Use WiFi Manager to add calibration value
+  //float temperature = bme.readTemperature(); // Default
   String v1 = ("temperature,room=" + String(room) + ",floor=" + String(level) + " value=" + String(temperature));
   float humidity = bme.readHumidity();
   String v2 = ("humidity,room=" + String(room) + ",floor=" + String(level) + " value=" + String(humidity));
   float pressure = bme.readPressure() / 100.0F;
   String v3 = ("pressure,room=" + String(room) + ",floor=" + String(level) + " value=" + String(pressure));
+  float altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
+  String v4 = ("altitude,room=" + String(room) + ",floor=" + String(level) + " value=" + String(altitude));
   Serial.print("Temperature: ");
   Serial.print(temperature, 4); Serial.println("°C.");
   Serial.print("Humidity: ");
   Serial.print(humidity, 2); Serial.println("% RH.");
   Serial.print("Pressure: ");
   Serial.print(pressure, 0); Serial.println("hPa.");
+  Serial.print("Altitude: ");
+  Serial.print(altitude, 2); Serial.println("m");
   client.publish(channel, v1.c_str(), true);
   client.publish(channel, v2.c_str(), true);
   client.publish(channel, v3.c_str(), true);
-  Serial.println("Temperature, humidity and pressure data sent to MQTT server!");
+  client.publish(channel, v4.c_str(), true);
+  Serial.println("Temperature, humidity, pressure and altitude data sent to MQTT server!");
   delay(60000);
 }
