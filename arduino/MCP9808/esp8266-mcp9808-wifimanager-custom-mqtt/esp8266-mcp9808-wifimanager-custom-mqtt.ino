@@ -1,7 +1,7 @@
 #include <FS.h>
 #include <ESP8266WiFi.h> // To connect to WiFi
 #include <Wire.h>  // Only needed for Arduino 1.6.5 and earlier
-#include <Adafruit_BME280.h> // BME280 sensor
+#include "Adafruit_MCP9808.h" // MCP9808 temperature sensor
 #include <PubSubClient.h>
 #include <WiFiManager.h>
 #include <Ticker.h>
@@ -19,10 +19,8 @@ Ticker ticker;
 // For LED ticker
 int LED = LED_BUILTIN;
 
-// Configure the BME280 sensor
-#define SEALEVELPRESSURE_HPA (1023.00)
-Adafruit_BME280 bme; // I2C
-
+// Initialise the MCP9808 sensor
+Adafruit_MCP9808 tempsensor = Adafruit_MCP9808();
 
 // Static IP address
 char static_ip[16] = "192.168.1.148";
@@ -34,7 +32,7 @@ char mqtt_server[40] = "192.168.1.24";
 char channel[10] = "sensors";
 char level[10] = "upstairs";
 char room[20] = "dev";
-char temp_calibration[6] = "5.57";
+char temp_calibration[6] = "6.5";
 WiFiClient espClient;
 PubSubClient client(espClient);
 
@@ -163,6 +161,7 @@ void setup() {
     json["channel"] = channel;
     json["level"] = level;
     json["room"] = room;
+    json["temp_calibration"] = temp_calibration;
     json["ip"] = WiFi.localIP().toString();
     json["gateway"] = WiFi.gatewayIP().toString();
     json["subnet"] = WiFi.subnetMask().toString();
@@ -180,13 +179,19 @@ void setup() {
   client.setServer(mqtt_server, 1883);
   Serial.println("Connected to MQTT server: " + String(mqtt_server));
   Serial.println("");
-  bool status;
-  status = bme.begin(0x76);  
-  if (!status) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
+  Serial.println("Initialising MCP9808 sensor...");
+  /* Initialise the sensor */
+  if (!tempsensor.begin(0x18)) {
+    Serial.println("Couldn't find the MCP9808 sensor! Check the connections and that the I2C address is correct.");
     while (1);
   }
-  Serial.println("Found BME280 sensor!");
+  Serial.println("Found MCP9808 sensor!");
+  tempsensor.setResolution(3); // sets the resolution of the reading:
+  // Mode Resolution SampleTime
+  //  0    0.5°C       30 ms
+  //  1    0.25°C      65 ms
+  //  2    0.125°C     130 ms
+  //  3    0.0625°C    250 ms
 }
 
 void reconnect() {
@@ -210,30 +215,17 @@ void loop() {
   if (!client.connected()) {
     reconnect();
   }
+  // For temperature calibration
   char* tc = temp_calibration;
   char temp_calib_alt = (char)atoi(tc);
   float temp_calib = (float)temp_calib_alt;
-  float temperature = bme.readTemperature() - temp_calib; // Use WiFi Manager to add calibration value
-  //float temperature = bme.readTemperature(); // Default
+  //float c = tempsensor.readTempC(); // Default
+  float temperature = tempsensor.readTempC() - temp_calib; // Calibrated value for sensor if housed in a case
+  Serial.print("Temp: ");
+  Serial.print(temperature, 4); Serial.print("°C\t.");
+  Serial.println("");
   String v1 = ("temperature,room=" + String(room) + ",floor=" + String(level) + " value=" + String(temperature));
-  float humidity = bme.readHumidity();
-  String v2 = ("humidity,room=" + String(room) + ",floor=" + String(level) + " value=" + String(humidity));
-  float pressure = bme.readPressure() / 100.0F;
-  String v3 = ("pressure,room=" + String(room) + ",floor=" + String(level) + " value=" + String(pressure));
-  float altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
-  String v4 = ("altitude,room=" + String(room) + ",floor=" + String(level) + " value=" + String(altitude));
-  Serial.print("Temperature: ");
-  Serial.print(temperature, 4); Serial.println("°C.");
-  Serial.print("Humidity: ");
-  Serial.print(humidity, 2); Serial.println("% RH.");
-  Serial.print("Pressure: ");
-  Serial.print(pressure, 0); Serial.println("hPa.");
-  Serial.print("Altitude: ");
-  Serial.print(altitude, 2); Serial.println("m");
   client.publish(channel, v1.c_str(), true);
-  client.publish(channel, v2.c_str(), true);
-  client.publish(channel, v3.c_str(), true);
-  client.publish(channel, v4.c_str(), true);
-  Serial.println("Temperature, humidity, pressure and altitude data sent to MQTT server!");
+  Serial.println("Data sent to MQTT server!");
   delay(60000);
 }

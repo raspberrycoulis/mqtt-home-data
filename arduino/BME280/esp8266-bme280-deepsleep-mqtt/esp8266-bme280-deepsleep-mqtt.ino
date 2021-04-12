@@ -7,6 +7,7 @@ const char* ssid = "ADD_HERE";
 const char* password = "ADD_HERE";
 
 // Configure the BME280 sensor
+#define SEALEVELPRESSURE_HPA (1023.00)
 Adafruit_BME280 bme; // I2C
 
 // We make a structure to store connection information
@@ -57,10 +58,10 @@ void setup() {
       rtcValid = true;
     }
   }
-  // Report the battery level in the serial console
-  batt = ESP.getVcc();
-  Serial.print("Battery Voltage ");
-  Serial.println(batt/1023.0F);
+  // Report the battery level in the serial console - moved to sendMQTTmessage()
+  //batt = ESP.getVcc();
+  //Serial.print("Battery Voltage ");
+  //Serial.println(batt/1023.0F);
 
   // Start connection WiFi
   //Switch Radio back On
@@ -152,23 +153,28 @@ void sendMQTTmessage()
   float temperature = bme.readTemperature();
   float humidity = bme.readHumidity();
   float pressure = bme.readPressure() / 100.0F;
+  float altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
+  float batt = ESP.getVcc();
   Serial.print("Temperature: ");
-  Serial.print(temperature, 4); Serial.print("°C\t.");
-  Serial.println("");
+  Serial.print(temperature, 4); Serial.println("°C.");
   Serial.print("Humidity: ");
-  Serial.print(humidity, 2); Serial.print("% RH\t.");
-  Serial.println("");
+  Serial.print(humidity, 2); Serial.println("% RH.");
   Serial.print("Pressure: ");
-  Serial.print(pressure, 2); Serial.print("hPa\t.");
-  Serial.println("");
+  Serial.print(pressure, 2); Serial.println("hPa.");
+  Serial.print("Altitude: ");
+  Serial.print(altitude, 2); Serial.println("m.");
+  Serial.print("Battery: ");
+  Serial.print(batt / 1023.0F, 2); Serial.println("V.");
   String v1 = ("temperature,room=" + String(room) + ",floor=" + String(level) + " value=" + String(temperature));
   String v2 = ("humidity,room=" + String(room) + ",floor=" + String(level) + " value=" + String(humidity));
   String v3 = ("pressure,room=" + String(room) + ",floor=" + String(level) + " value=" + String(pressure));
-  String v4 = ("battery,room=" + String(room) + ",floor=" + String(level) + " value=" + String(batt / 1023.0F));
+  String v4 = ("altitude,room=" + String(room) + ",floor=" + String(level) + " value=" + String(altitude));
+  String v5 = ("battery,room=" + String(room) + ",floor=" + String(level) + " value=" + String(batt / 1023.0F));
   client.publish(channel, v1.c_str(), true);
   client.publish(channel, v2.c_str(), true);
   client.publish(channel, v3.c_str(), true);
   client.publish(channel, v4.c_str(), true);
+  client.publish(channel, v5.c_str(), true);
   Serial.println("Data sent to MQTT server!");
   client.disconnect();
 }

@@ -9,6 +9,7 @@
 SSD1306Wire  display(0x3c, D2, D1);  //D2=SDK  D1=SCK  As per labeling on NodeMCU
 
 // Configure the BME280 sensor
+#define SEALEVELPRESSURE_HPA (1023.00)
 Adafruit_BME280 bme; // I2C
 
 // WiFi credentials
@@ -82,11 +83,13 @@ void loop() {
     reconnect();
   }
   handleTemperature();
-  delay(5000);
+  delay(15000);
   handleHumidity();
-  delay(5000);
+  delay(15000);
   handlePressure();
-  delay(5000);
+  delay(15000);
+  handleAltitude();
+  delay(15000);
 }
 
 void handleTemperature() {
@@ -134,4 +137,17 @@ void handlePressure() {
   Serial.println("Pressure sent to MQTT server...");
 }
 
+void handleAltitude() {
+  float altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
+  display.clear();
+  display.setTextAlignment(TEXT_ALIGN_CENTER);
+  display.setFont(ArialMT_Plain_10);
+  display.drawString(64, 10, "Altitude:");
+  display.setFont(ArialMT_Plain_24);
+  display.drawString(64, 25, String(altitude, 2) + "m");
+  display.display();
+  String v4 = ("altitude,room=" + String(room) + ",floor=" + String(level) + " value=" + String(altitude));
+  client.publish(channel, v4.c_str(), true);
+  Serial.println("Altitude sent to MQTT server...");
+}
 //=========================================================================
