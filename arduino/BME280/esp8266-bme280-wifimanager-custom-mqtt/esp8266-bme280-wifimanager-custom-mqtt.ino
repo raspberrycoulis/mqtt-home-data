@@ -211,6 +211,7 @@ void loop() {
   if (!client.connected()) {
     reconnect();
   }
+  // For temperature calibration
   char* tc = temp_calibration;
   char temp_calib_alt = (char)atoi(tc);
   float temp_calib = (float)temp_calib_alt;
