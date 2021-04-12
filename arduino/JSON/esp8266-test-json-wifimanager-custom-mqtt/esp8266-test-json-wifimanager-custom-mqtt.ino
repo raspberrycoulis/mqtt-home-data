@@ -197,6 +197,7 @@ void loop() {
  
   JSONencoder["device"] = "ESP8266";
   JSONencoder["sensorType"] = "Test";
+  JSONencoder["number"] = 666;
   JsonArray& values = JSONencoder.createNestedArray("values");
  
   values.add(999);
