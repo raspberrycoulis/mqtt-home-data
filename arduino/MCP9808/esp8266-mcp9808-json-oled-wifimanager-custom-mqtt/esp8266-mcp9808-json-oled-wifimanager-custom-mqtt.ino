@@ -236,16 +236,30 @@ void loop() {
   display.drawString(64, 25, String(temperature, 2) + "°C");
   display.display();
 
-  // Construct JSON object with sensor data
+  // Do JSON stuff
   StaticJsonBuffer<300> JSONbuffer;
   JsonObject& JSONencoder = JSONbuffer.createObject();
+
+  // Start of JSON configuration options - use only one set!
+  // Use below if EasyMQTT iOS app is not needed
+  //JSONencoder["device"] = String(client_id);
+  //JSONencoder["sensor"] = "MCP9808";
+  //JSONencoder["level"] = String(level);
+  //JSONencoder["temperature"] = temperature;
+
+  // Use below if EasyMQTT iOS app IS needed
+  JsonObject& JSONencoderNested = JSONencoder.createNestedObject(client_id);
+  JSONencoderNested["temperature"] = temperature;
   JSONencoder["device"] = String(client_id);
   JSONencoder["sensor"] = "MCP9808";
   JSONencoder["level"] = String(level);
-  JSONencoder["temperature"] = temperature;
- 
-  char JSONmessageBuffer[150];
+  // End of JSON coniguration options - be sure to comment out one set!
+  
+  // Contiune to do JSON stuff
+  char JSONmessageBuffer[100];
   JSONencoder.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
+
+  // Send data to MQTT broker
   Serial.println("Sending message to MQTT topic..");
   Serial.println(JSONmessageBuffer);
   client.publish(channel, JSONmessageBuffer, true);

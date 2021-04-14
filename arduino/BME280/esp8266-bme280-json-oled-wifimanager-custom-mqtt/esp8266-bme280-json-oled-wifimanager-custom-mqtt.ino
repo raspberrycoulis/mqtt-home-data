@@ -284,26 +284,44 @@ void publishData() {
   char* tc = temp_calibration;
   char temp_calib_alt = (char)atoi(tc);
   float temp_calib = (float)temp_calib_alt;
-  // Get sensor data from BME280
+  // Get sensor data from BME280 in forced mode to reduce heat from sensor
   bme.takeForcedMeasurement();
   float temperature = bme.readTemperature() - temp_calib; // Use WiFi Manager to add calibration value
   //float temperature = bme.readTemperature(); // Default
   float humidity = bme.readHumidity();
   float pressure = bme.readPressure() / 100.0F;
   float altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
+  
+  // Do JSON stuff
   StaticJsonBuffer<300> JSONbuffer;
   JsonObject& JSONencoder = JSONbuffer.createObject();
-   // Construct JSON object with sensor data
+
+  // Start of JSON configuration options - use only one set!
+  // Use below if EasyMQTT iOS app is not needed
+  //JSONencoder["device"] = String(client_id);
+  //JSONencoder["sensor"] = "BME280";
+  //JSONencoder["level"] = String(level);
+  //JSONencoder["temperature"] = temperature;
+  //JSONencoder["humidity"] = humidity;
+  //JSONencoder["pressure"] = pressure;
+  //JSONencoder["altitude"] = altitude;
+
+  // Use below if EasyMQTT iOS app IS needed
+  JsonObject& JSONencoderNested = JSONencoder.createNestedObject(client_id);
+  JSONencoderNested["temperature"] = temperature;
+  JSONencoderNested["humidity"] = humidity;
+  JSONencoderNested["pressure"] = pressure;
+  JSONencoderNested["altitude"] = altitude;
   JSONencoder["device"] = String(client_id);
   JSONencoder["sensor"] = "BME280";
   JSONencoder["level"] = String(level);
-  JSONencoder["temperature"] = temperature;
-  JSONencoder["humidity"] = humidity;
-  JSONencoder["pressure"] = pressure;
-  JSONencoder["altitude"] = altitude;
+  // End of JSON coniguration options - be sure to comment out one set!
   
+  // Contiune to do JSON stuff
   char JSONmessageBuffer[150];
   JSONencoder.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
+
+  // Send data to MQTT
   Serial.println("Sending message to MQTT topic..");
   Serial.println(JSONmessageBuffer);
   client.publish(channel, JSONmessageBuffer, true);

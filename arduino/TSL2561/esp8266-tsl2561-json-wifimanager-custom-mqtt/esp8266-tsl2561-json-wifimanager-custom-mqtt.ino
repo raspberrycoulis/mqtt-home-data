@@ -224,21 +224,34 @@ void loop() {
   if (!client.connected()) {
     reconnect();
   }
-  StaticJsonBuffer<300> JSONbuffer;
-  JsonObject& JSONencoder = JSONbuffer.createObject();
-
   // Get sensor data
   sensors_event_t event;
   tsl.getEvent(&event);
 
-  // Construct JSON object with sensor data
+  // Do JSON stuff
+  StaticJsonBuffer<300> JSONbuffer;
+  JsonObject& JSONencoder = JSONbuffer.createObject();
+
+  // Start of JSON configuration options - use only one set!
+  // Use below if EasyMQTT iOS app is not needed
+  //JSONencoder["device"] = String(client_id);
+  //JSONencoder["sensor"] = "TSL2561";
+  //JSONencoder["level"] = String(level);
+  //JSONencoder["lux"] = event.light;
+
+  // Use below if EasyMQTT iOS app IS needed
+  JsonObject& JSONencoderNested = JSONencoder.createNestedObject(client_id);
+  JSONencoderNested["lux"] = event.light;
   JSONencoder["device"] = String(client_id);
   JSONencoder["sensor"] = "TSL2561";
   JSONencoder["level"] = String(level);
-  JSONencoder["lux"] = event.light;
- 
+  // End of JSON coniguration options - be sure to comment out one set!
+  
+  // Contiune to do JSON stuff
   char JSONmessageBuffer[100];
   JSONencoder.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
+
+  // Send data to MQTT broker
   Serial.println("Sending message to MQTT topic..");
   Serial.println(JSONmessageBuffer);
   client.publish(channel, JSONmessageBuffer, true);
