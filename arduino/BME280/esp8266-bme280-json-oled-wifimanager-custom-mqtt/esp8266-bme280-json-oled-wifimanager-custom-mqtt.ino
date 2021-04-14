@@ -318,7 +318,7 @@ void publishData() {
   // End of JSON coniguration options - be sure to comment out one set!
   
   // Contiune to do JSON stuff
-  char JSONmessageBuffer[150];
+  char JSONmessageBuffer[200];
   JSONencoder.printTo(JSONmessageBuffer, sizeof(JSONmessageBuffer));
 
   // Send data to MQTT
