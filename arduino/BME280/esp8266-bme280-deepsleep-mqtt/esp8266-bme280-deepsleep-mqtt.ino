@@ -7,7 +7,7 @@ const char* ssid = "ADD_HERE";
 const char* password = "ADD_HERE";
 
 // Configure the BME280 sensor
-#define SEALEVELPRESSURE_HPA (1023.00)
+#define SEALEVELPRESSURE_HPA (1013.25)
 Adafruit_BME280 bme; // I2C
 
 // We make a structure to store connection information
