@@ -24,7 +24,7 @@ SSD1306Wire  display(0x3c, D2, D1);  //D2=SDK  D1=SCK  As per labeling on NodeMC
 int LED = LED_BUILTIN;
 
 // Configure the BME280 sensor
-#define SEALEVELPRESSURE_HPA (1013.25)
+#define SEALEVELPRESSURE_HPA (1035)
 Adafruit_BME280 bme; // I2C
 
 // Static IP address
