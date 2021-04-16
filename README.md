@@ -36,6 +36,7 @@ Included is a `docker-compose.yml` file that can be used to get up-and-running q
 
 **IMPORTANT NOTE - Running InfluxDB on a Raspberry Pi can quickly wear out a micro SD card due to the read / write activity involved, so it is recommended that the InfluxDB is contained on a separate device, such as a USB drive / HDD, or even in the cloud / on a NAS. If your SD card stops working faster than normal, then you have been warned!**
 #### For Raspberry Pi (Python) ####
+
 * Python PIP and Python3 PIP (`sudo apt-get update && sudo apt-get install python-pip python3-pip -y`)
 * SMBUS (`sudo pip install smbus && sudo pip3 install smbus`)
 * Paho MQTT (`sudo pip install paho-mqtt` or `sudo pip3 install paho-mqtt`)
@@ -43,7 +44,8 @@ Included is a `docker-compose.yml` file that can be used to get up-and-running q
 * The Python BME280 library is included as `bme280.py` so this file must be in the same location as any Python code that includes the BME280 sensor to work
 
 #### For ESP8266 (C++ via Arduino) ####
-* `ESP8266WiFi.h` - to connect ESP8266 to WiFi
+
+* `ESP8266WiFi.h` - to connect ESP8266 to WiFi ([GitHub repository](https://github.com/esp8266/Arduino))
 * `Adafruit_BME280.h` - Adafruit's BME280 sensor library ([GitHub repository](https://github.com/adafruit/Adafruit_BME280_Library))
 * `Adafruit_MCP9808.h` - Adafruit's MCP9808 sensor library ([GitHub repository](https://github.com/adafruit/Adafruit_MCP9808_Library))
 * `Adafruit_TSL2561_U.h` - Adafruit's TSL2561 unified sensor library ([GitHub repository](https://github.com/adafruit/Adafruit_TSL2561))
