@@ -32,14 +32,14 @@ Included is a `docker-compose.yml` file that can be used to get up-and-running q
 * For the Si7021 sensor (`sudo pip3 install adafruit-circuitpython-si7021`)
 * The Python BME280 library is included as `bme280.py` so this file must be in the same location as any Python code that includes the BME280 sensor to work
 #### For ESP8266 (C++ via Arduino) ####
-  * `ESP8266WiFi.h` - to connect ESP8266 to WiFi
-  * `Adafruit_BME280.h` - Adafruit's BME280 sensor library ([GitHub repository](https://github.com/adafruit/Adafruit_BME280_Library))
-  * `Adafruit_MCP9808.h` - Adafruit's MCP9808 sensor library ([GitHub repository](https://github.com/adafruit/Adafruit_MCP9808_Library))
-  * `Adafruit_TSL2561_U.h` - Adafruit's TSL2561 unified sensor library ([GitHub repository](https://github.com/adafruit/Adafruit_TSL2561))
-  * `SSD1306Wire.h` - ThingPulse's SSD1306 library for the OLED display ([GitHub repository](https://github.com/ThingPulse/esp8266-oled-ssd1306))
-  * `PubSubClient.h` - for MQTT publishing ([GitHub repository](https://github.com/knolleary/pubsubclient))
-  * `WiFiManager.h` - for configuring WiFi OTA ([GitHub repository](https://github.com/tzapu/WiFiManager))
-  * `ArduinoJson.h` - to send JSON data to MQTT ([GitHub repository](https://github.com/bblanchon/ArduinoJson))
+* `ESP8266WiFi.h` - to connect ESP8266 to WiFi
+* `Adafruit_BME280.h` - Adafruit's BME280 sensor library ([GitHub repository](https://github.com/adafruit/Adafruit_BME280_Library))
+* `Adafruit_MCP9808.h` - Adafruit's MCP9808 sensor library ([GitHub repository](https://github.com/adafruit/Adafruit_MCP9808_Library))
+* `Adafruit_TSL2561_U.h` - Adafruit's TSL2561 unified sensor library ([GitHub repository](https://github.com/adafruit/Adafruit_TSL2561))
+* `SSD1306Wire.h` - ThingPulse's SSD1306 library for the OLED display ([GitHub repository](https://github.com/ThingPulse/esp8266-oled-ssd1306))
+* `PubSubClient.h` - for MQTT publishing ([GitHub repository](https://github.com/knolleary/pubsubclient))
+* `WiFiManager.h` - for configuring WiFi OTA ([GitHub repository](https://github.com/tzapu/WiFiManager))
+* `ArduinoJson.h` - to send JSON data to MQTT ([GitHub repository](https://github.com/bblanchon/ArduinoJson))
 
 ### Acknowledgements ###
 
