@@ -19,7 +19,7 @@ One key problem that many projects have is finding a suitable case to house your
 
 I personally use the [Hammond 1551V3WH Miniature Plastic Enclosure Vented 60x60x20mm White](https://www.hammfg.com/electronics/small-case/plastic/1551v), which fits my Wemo D1 Mini and applicable sensor in perfectly, plus is vented so allows better circulation on the sensors (with exception of the TSL2561 as this still needs to be able to "see" the light, so may need to be mounted externally or with a hole cut to allow light ingress.). If using a Node MCU or larger board, you can purchase a large dimenions case to accommodate, but I would always recommend the Wemo D1 Mini due to the size.
 
-![Hammond Vented Enclosure](https://github.com/raspberrycoulis/mqtt-home-data/blob/master/hammond-case.jpeg?raw=true)
+![Hammond Vented Enclosure](https://github.com/raspberrycoulis/mqtt-home-data/blob/master/hammond-case.png?raw=true)
 
 The cases are also found in abundance on eBay and other reputable electronic specialists and include screw mount holes for the sensors (you will need some 4mm long M2 or M2.5 screws to mount the sensors - also available on eBay). I then mount the Wemo D1 Mini with some hot glue and then cut away a few of the vents in the case to allow USB access for power.
 
