@@ -5,6 +5,7 @@ A repository that contains a variety of code examples, primarily in Python or C+
 ### What sensors are used? ###
 
 The list below may grow over time, but currently:
+
 * BME280 (for temperature, humidity, pressure and altitude)
 * MCP9808 (for high accuracy temperature)
 * TSL2561 (for luminence (light levels))
