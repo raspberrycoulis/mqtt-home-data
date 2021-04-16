@@ -31,6 +31,7 @@ Included is a `docker-compose.yml` file that can be used to get up-and-running q
 * Paho MQTT (`sudo pip install paho-mqtt` or `sudo pip3 install paho-mqtt`)
 * For the Si7021 sensor (`sudo pip3 install adafruit-circuitpython-si7021`)
 * The Python BME280 library is included as `bme280.py` so this file must be in the same location as any Python code that includes the BME280 sensor to work
+
 #### For ESP8266 (C++ via Arduino) ####
 * `ESP8266WiFi.h` - to connect ESP8266 to WiFi
 * `Adafruit_BME280.h` - Adafruit's BME280 sensor library ([GitHub repository](https://github.com/adafruit/Adafruit_BME280_Library))
