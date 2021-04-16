@@ -5,14 +5,21 @@ A repository that contains a variety of code examples, primarily in Python or C+
 ### What sensors are used? ###
 
 The list below may grow over time, but currently:
-* BME280 (for temperature, humidity and pressure)
+* BME280 (for temperature, humidity, pressure and altitude)
 * MCP9808 (for high accuracy temperature)
-* TSL2561 (for luminence)
-* MS430 (for temperature, humidity, pressure, air quality, sound levels, luminence and air particulates)
+* TSL2561 (for luminence (light levels))
+* MS430 by [Metriful](https://www.metriful.com/) (for temperature, humidity, pressure, air quality, sound levels, luminence and air particulates)
 * [Enviro pHAT](https://shop.pimoroni.com/products/enviro-phat) (for temperature, pressure, luminence, RGB light values and movement)
 * Si7021 (for temperature and humidity)
 
 Additionally, a small OLED display is used in some to display data.
+
+### Recommended case for ESP8266 + sensor(s) ###
+One key problem that many projects have is finding a suitable case to house your ESP8266 board and sensor(s) in, or involves 3D printing something. Fortunately, there are some cases already available that are ideal for simple projects such as this. 
+
+I personally use the [Hammond 1551V3WH Miniature Plastic Enclosure Vented 60x60x20mm White](https://www.hammfg.com/electronics/small-case/plastic/1551v), which fits my Wemo D1 Mini and applicable sensor in perfectly, plus is vented so allows better circulation on the sensors (with exception of the TSL2561 as this still needs to be able to "see" the light, so may need to be mounted externally or with a hole cut to allow light ingress.). If using a Node MCU or larger board, you can purchase a large dimenions case to accommodate, but I would always recommend the Wemo D1 Mini due to the size.
+
+The cases are also found in abundance on eBay and other reputable electronic specialists and include screw mount holes for the sensors (you will need some 4mm long M2 or M2.5 screws to mount the sensors - also available on eBay). I then mount the Wemo D1 Mini with some hot glue and then cut away a few of the vents in the case to allow USB access for power.
 
 ### Requirements ###
 #### For data visualisation ####
