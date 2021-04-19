@@ -15,6 +15,10 @@ The list below may grow over time, but currently:
 
 Additionally, a small OLED display is used in some to display data, as well as the [Micro Dot pHAT from Pimoroni](https://shop.pimoroni.com/products/microdot-phat) for the Raspberry Pi for another example.
 
+#### Do you plan on adding any more sensors? ####
+
+Quite possibly yes. The core elements of my code examples are straightforward enough to allow the inclusion of other sensors. The current examples are based on the sensors I currently own, but if / when I get more then I'll aim to update this accordingly.
+
 ### Recommended case for ESP8266 + sensor(s) ###
 
 One key problem that many projects have is finding a suitable case to house your ESP8266 board and sensor(s) in, or involves 3D printing something. Fortunately, there are some cases already available that are ideal for simple projects such as this. 
