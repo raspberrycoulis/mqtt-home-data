@@ -13,7 +13,7 @@ The list below may grow over time, but currently:
 * [Enviro pHAT](https://shop.pimoroni.com/products/enviro-phat) (for temperature, pressure, luminence, RGB light values and movement)
 * Si7021 (for temperature and humidity)
 
-Additionally, a small OLED display is used in some to display data.
+Additionally, a small OLED display is used in some to display data, as well as the [Micro Dot pHAT from Pimoroni](https://shop.pimoroni.com/products/microdot-phat) for the Raspberry Pi for another.
 
 ### Recommended case for ESP8266 + sensor(s) ###
 
