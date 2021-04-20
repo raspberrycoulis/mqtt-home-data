@@ -66,7 +66,7 @@ while True:
         if temperature is not None and pressure is not None and humidity is not None:
             try:
                 now = datetime.datetime.now()
-                client.publish(channel, JSON_mqtt_data)
+                client.publish(channel, JSON_mqtt_data, qos=0, retain=True)
                 print("Data sent to MQTT broker " + str(brokerAddress) + " at " + (now.strftime("%H:%M:%S on %d/%m/%Y")))
                 sys.stdout.flush()
                 # Microdot pHAT stuff
