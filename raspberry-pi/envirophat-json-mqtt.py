@@ -12,7 +12,7 @@ import paho.mqtt.client as mqtt
 
 # MQTT details - Update accordingly
 brokerAddress = "192.168.1.24"  # IP or URL of your MQTT broker
-clientName = "EnviroPi"         # The name your client reports to MQTT broker
+clientName = "ServerPi"         # The name your client reports to MQTT broker
 channel = "homedev"             # The channel the MQTT data is published to
 room = "dining-room"            # The room your sensor is in - i.e. living-room
 zone = "downstairs"             # The zone your sensor is in - i.e. upstairs
