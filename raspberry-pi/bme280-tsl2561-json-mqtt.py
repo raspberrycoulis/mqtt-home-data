@@ -77,7 +77,7 @@ while True:
                 "humidity" : humidity,
                 "pressure" : pressure
                 },
-                "ts2561" : {
+                "tsl2561" : {
                 "sensor" : "TSL2561",
                 "lux" : lux
                 },
