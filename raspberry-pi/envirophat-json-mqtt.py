@@ -59,7 +59,7 @@ while True:
             "lux" : lux
         },
         "device" : room,
-        "sensor" : "Enviro pHAT",
+        "sensor" : "Enviro-pHAT",
         "level" : zone
     }
     JSON_mqtt_data = json.dumps(raw_mqtt_data)
@@ -71,9 +71,9 @@ while True:
             print("Data sent to MQTT broker " + str(brokerAddress) + " at " + (now.strftime("%H:%M:%S on %d/%m/%Y")))
             sys.stdout.flush()
         except Exception:
-          # Error
-          print ("Error while sending to MQTT broker")
-          sys.stdout.flush()
+            # Error
+            print ("Error while sending to MQTT broker")
+            sys.stdout.flush()
 
     # Sleep some time
     time.sleep(period)
