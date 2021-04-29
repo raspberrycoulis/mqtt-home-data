@@ -1,7 +1,8 @@
 #include <FS.h>
 #include <ESP8266WiFi.h> // To connect to WiFi
 #include <Wire.h>  // Only needed for Arduino 1.6.5 and earlier
-#include "Adafruit_Si7021.h"// Si7201 temperature sensor
+//#include "Adafruit_Si7021.h"// Si7201 temperature sensor
+#include "Adafruit_HTU21DF.h" // Some cheap Si7201 sensors are HTU21D-F sensors, so use this if so.
 #include <PubSubClient.h>
 #include <WiFiManager.h>
 #include <Ticker.h>
@@ -20,7 +21,8 @@ Ticker ticker;
 int LED = LED_BUILTIN;
 
 // Initialise the Si7201 sensor
-Adafruit_Si7021 sensor = Adafruit_Si7021();
+//Adafruit_Si7021 sensor = Adafruit_Si7021(); // Use for Adafruit Si7021 sensors
+Adafruit_HTU21DF htu = Adafruit_HTU21DF(); // Use if sensor is not found with Si7021 library
 
 // Static IP address
 char static_ip[16] = "192.168.1.148";
@@ -181,7 +183,8 @@ void setup() {
   Serial.println("");
   Serial.println("Initialising Si7201 sensor...");
   /* Initialise the Si7201 sensor */
-  if (!sensor.begin()) {
+  //if (!sensor.begin()) { // Use for Adafruit Si7021 sensors
+  if (!htu.begin()) { // Use for cheap "Si7021" sensors
     Serial.println("Couldn't find the Si7201 sensor! Check the connections and that the I2C address is correct.");
     while (1);
   }
@@ -211,10 +214,11 @@ void loop() {
   char temp_calib_alt = (char)atoi(tc);
   float temp_calib = (float)temp_calib_alt;
   // Get sensor data from Si7201
-  float temperature = sensor.readTemperature() - temp_calib; // Use WiFi Manager to add calibration value
-  //float temperature = sensor.readTemperature(); // Default
-  float humidity = sensor.readHumidity();
-
+  //float temperature = sensor.readTemperature() - temp_calib; // Use for Adafruit Si7021 sensors
+  float temperature = htu.readTemperature() - temp_calib; // Use for cheap "Si7021" sensors
+  //float humidity = sensor.readHumidity(); // Use for Adafruit Si7021 sensors
+  float humidity = htu.readHumidity(); // Use for cheap "Si7021" sensors
+  
   // Do JSON stuff
   StaticJsonBuffer<300> JSONbuffer;
   JsonObject& JSONencoder = JSONbuffer.createObject();
