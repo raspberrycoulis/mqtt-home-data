@@ -67,7 +67,7 @@ while True:
         try:
             # Send data to MQTT
             now = datetime.datetime.now()
-            client.publish(channel, JSON_mqtt_data)
+            client.publish(channel, JSON_mqtt_data, qos=0, retain=True)
             print("Data sent to MQTT broker " + str(brokerAddress) + " at " + (now.strftime("%H:%M:%S on %d/%m/%Y")))
             sys.stdout.flush()
         except Exception:
