@@ -63,7 +63,7 @@ Included is a `docker-compose.yml` file that can be used to get up-and-running q
 
 ### How data is reported ###
 
-For convenience, the preferred method for sending data is done using the JSON format. Using JSON to send the data to the MQTT broker allows you to use other IoT related accessories, such as the [iOS app EasyMQTT](https://www.easymqtt.app/), to create widgts on your iOS device. All code examples that utilise JSON for this purposes include `json` in their title - for example, `esp8266-bme280-json-wifimanager-custom-mqtt.ino`.
+For convenience, the preferred method for sending data is done using the JSON format. Using JSON to send the data to the MQTT broker allows you to use other IoT related accessories, such as the [iOS app EasyMQTT](https://www.easymqtt.app/), to create widgets on your iOS device. All code examples that utilise JSON for this purposes include `json` in their title - for example, `esp8266-bme280-json-wifimanager-custom-mqtt.ino`.
 
 JSON data is sent to the MQTT broker in the following format:
 
