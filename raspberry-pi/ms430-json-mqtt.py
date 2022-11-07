@@ -134,7 +134,7 @@ while (True):
     }
     JSON_mqtt_data = json.dumps(raw_mqtt_data)
     # Now try sending the data to MQTT broker
-    if temperature_data is not None and humidity_data is not None and pressue_data is not None and lux_data is not None and aq_index is not None and aq_accuracy is not None and bvoc_data is not None and co2_data is not None and gas_data is not None and peak_amp_data is not None and dba_data is not None:
+    if temperature_data is not None and humidity_data is not None and pressure_data is not None and lux_data is not None and aq_index is not None and aq_accuracy is not None and bvoc_data is not None and co2_data is not None and gas_data is not None and peak_amp_data is not None and dba_data is not None:
           try:
             # Send data to MQTT
             now = datetime.datetime.now()
