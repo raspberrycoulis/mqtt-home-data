@@ -139,7 +139,7 @@ while (True):
           try:
             # Send data to MQTT
             now = datetime.datetime.now()
-            client.publish(channel, JSON_mqtt_data, qos=1, retain=True)
+            client.publish(channel, JSON_mqtt_data,1,True)
             sys.stdout.flush()
           except Exception:
             # Error
