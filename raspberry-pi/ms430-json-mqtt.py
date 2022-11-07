@@ -24,7 +24,8 @@ print_data_as_columns = False
 # MQTT details
 brokerAddress = "192.168.1.24"  # Update accordingly
 clientName = "MS430-Pi"         # Update accordingly
-room = "office-ms430"            # Update accordingly
+channel = "homedev"             # Update accordingly
+room = "office-ms430"           # Update accordingly
 zone = "upstairs"               # Update accordingly
 
 # Define the time between sending data to MQTT broker - default is 60 seconds
