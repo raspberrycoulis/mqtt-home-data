@@ -99,7 +99,7 @@ while (True):
     # Get sound data
     sound_data = get_sound_data(I2C_bus)
 
-    # Untested - formatting for JSON
+    # Formatting for JSON
     temperature_data = air_data['T']
     humidity_data = air_data['H_pc']
     pressure_data = air_data['P_Pa']/100
@@ -150,32 +150,6 @@ while (True):
             print ("Data sent to MQTT broker " + str(brokerAddress) + " at " + (now.strftime("%H:%M:%S on %d/%m/%Y")))
             sys.stdout.flush()
     time.sleep(period)
-
-    # Send data to MQTT
-    #print("Temperature = {:.1f} ".format(air_data['T_C']) + air_data['C_unit'])
-    #client.publish("sensors", "temperature,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.1f}".format(air_data['T']))
-    #print("Humidity = {:.1f} %".format(air_data['H_pc']))
-    #client.publish("sensors", "humidity,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.1f}".format(air_data['H_pc']))
-    #print("Pressure = " + str(air_data['P_Pa']/100) + " hPa")
-    #client.publish("sensors", "pressure,room=" + str(room) + ",floor=" + str(zone) + " value=" + str(air_data['P_Pa']/100))
-    #print("Lux = {:.2f} lux".format(light_data['illum_lux']))
-    #client.publish("sensors", "lux,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.2f}".format(light_data['illum_lux']))
-    #print("Air quality index = {:.1f}".format(air_quality_data['AQI']))
-    #client.publish("sensors", "airquality,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.1f}".format(air_quality_data['AQI']))
-    #print("Air quality accuracy = " + str(air_quality_data['AQI_accuracy']) + "/3")
-    #client.publish("sensors", "airquality-accuracy,room=" + str(room) + ",floor=" + str(zone) + " value=" + str(air_quality_data['AQI_accuracy']))
-    #print("Breath VOC = {:.2f} ppm".format(air_quality_data['bVOC']))
-    #client.publish("sensors", "bvoc,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.2f}".format(air_quality_data['bVOC']))
-    #print("Estimated CO" + SUBSCRIPT_2 + " = {:.1f} ppm".format(air_quality_data['CO2e']))
-    #client.publish("sensors", "co2,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.1f}".format(air_quality_data['CO2e']))
-    #print("Gas sensor resistance = " + str(air_data['G_ohm']) + " " + OHM_SYMBOL)
-    #client.publish("sensors", "gas-resistance,room=" + str(room) + ",floor=" + str(zone) + " value=" + str(air_data['G_ohm']))
-    #print("Peak amplitude = {:.2f} mPa".format(sound_data['peak_amp_mPa']))
-    #client.publish("sensors", "sound-peak-amp,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.2f}".format(sound_data['peak_amp_mPa']))
-    #print("A-weighted sound pressure = {:.1f} dBA".format(sound_data['SPL_dBA']))
-    #client.publish("sensors", "sound-decibels,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.1f}".format(sound_data['SPL_dBA']))
-    #print("Data sent to MQTT broker " + str(brokerAddress) + " at " + (now.strftime("%H:%M:%S on %d/%m/%Y")))
-    #time.sleep(60)
 
     if (particleSensor != PARTICLE_SENSOR_OFF):
       raw_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, PARTICLE_DATA_READ, PARTICLE_DATA_BYTES)
