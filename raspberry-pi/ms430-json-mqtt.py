@@ -148,7 +148,7 @@ while (True):
             # Success!
             print ("Data sent to MQTT broker " + str(brokerAddress) + " at " + (now.strftime("%H:%M:%S on %d/%m/%Y")))
             sys.stdout.flush()
-      time.sleep(period)
+    time.sleep(period)
 
     # Send data to MQTT
     #print("Temperature = {:.1f} ".format(air_data['T_C']) + air_data['C_unit'])
