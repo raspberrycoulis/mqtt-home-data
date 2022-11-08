@@ -114,7 +114,7 @@ while (True):
     dba_data = sound_data['SPL_dBA']
 
     # Sort the data for JSON - variables set earlier used here
-    raw_matt_data = {
+    raw_mqtt_data = {
         room : {
             sensor : {
                 zone : {
