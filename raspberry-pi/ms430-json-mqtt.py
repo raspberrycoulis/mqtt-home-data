@@ -137,17 +137,24 @@ while (True):
 
     # Sort data for Home Assistant
     raw_ha_mqtt_data = {
-        "temperature" : temperature_data,
-        "humidity" : humidity_data,
-        "pressure" : pressure_data,
-        "lux" : lux_data,
-        "airquality" : aq_index,
-        "airqual_accuracy" : aq_accuracy,
-        "breath-voc" : bvoc_data,
-        "est-co2" : co2_data,
-        "gas-resistance" : gas_data,
-        "peak-amplitude" : peak_amp_data,
-        "dba" : dba_data
+        "details" : {
+            "sensor" : "MS430",
+            "device" : room,
+            "level" : zone
+        },
+        "values" : {
+            "temperature" : temperature_data,
+            "humidity" : humidity_data,
+            "pressure" : pressure_data,
+            "lux" : lux_data,
+            "airquality" : aq_index,
+            "airqual_accuracy" : aq_accuracy,
+            "breath-voc" : bvoc_data,
+            "est-co2" : co2_data,
+            "gas-resistance" : gas_data,
+            "peak-amplitude" : peak_amp_data,
+            "dba" : dba_data
+        },
     }
     HA_mqtt_data = json.dumps(raw_ha_mqtt_data)
     # Now try sending the data to MQTT broker
