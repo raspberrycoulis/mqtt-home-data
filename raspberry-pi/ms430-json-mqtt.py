@@ -115,9 +115,9 @@ while (True):
 
     # Sort the data for JSON - variables set earlier used here
     raw_mqtt_data = {
-        room : {
-            sensor : {
-                zone : {
+        zone : {
+            room : {
+                sensor : {
                     "temperature" : temperature_data,
                     "humidity" : humidity_data,
                     "pressure" : pressure_data,
