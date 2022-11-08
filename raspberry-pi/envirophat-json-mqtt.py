@@ -16,6 +16,7 @@ clientName = "ServerPi"         # The name your client reports to MQTT broker
 channel = "homedev"             # The channel the MQTT data is published to
 room = "dining-room"            # The room your sensor is in - i.e. living-room
 zone = "downstairs"             # The zone your sensor is in - i.e. upstairs
+sensor = "Enviro-pHAT"
 
 # Define the time between sending data to MQTT broker - default is 60 seconds
 period = 60
@@ -52,16 +53,30 @@ while True:
     # Get the first reading from the Enviro pHAT
     temperature,pressure,lux = weather.temperature() -5.8, weather.pressure()/100, light.light()
     # Sort the data for JSON - variables set earlier used here
+    ## New structure (UNTESTED)
     raw_mqtt_data = {
-        room : {
-            "temperature" : temperature,
-            "pressure" : pressure,
-            "lux" : lux
+        zone : {
+            room : {
+                sensor : {
+                    "temperature" : temperature,
+                    "pressure" : pressure,
+                    "lux" : lux
+                },
+            },
         },
-        "device" : room,
-        "sensor" : "Enviro-pHAT",
-        "level" : zone
     }
+
+    ## Previous structure
+    #raw_mqtt_data = {
+    #    room : {
+    #        "temperature" : temperature,
+    #        "pressure" : pressure,
+    #        "lux" : lux
+    #    },
+    #    "device" : room,
+    #    "sensor" : "Enviro-pHAT",
+    #    "level" : zone
+    #}
     JSON_mqtt_data = json.dumps(raw_mqtt_data)
     if temperature is not None and pressure is not None and lux is not None:
         try:
