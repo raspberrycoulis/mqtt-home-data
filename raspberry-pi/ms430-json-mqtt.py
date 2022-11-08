@@ -134,12 +134,29 @@ while (True):
         "level" : zone
     }
     JSON_mqtt_data = json.dumps(raw_mqtt_data)
+
+    # Sort data for Home Assistant
+    raw_ha_mqtt_data = {
+        "temperature" : temperature_data,
+        "humidity" : humidity_data,
+        "pressure" : pressure_data,
+        "lux" : lux_data,
+        "airquality" : aq_index,
+        "airqual_accuracy" : aq_accuracy,
+        "breath-voc" : bvoc_data,
+        "est-co2" : co2_data,
+        "gas-resistance" : gas_data,
+        "peak-amplitude" : peak_amp_data,
+        "dba" : dba_data
+    }
+    HA_mqtt_data = json.dumps(raw_ha_mqtt_data)
     # Now try sending the data to MQTT broker
     if temperature_data is not None and humidity_data is not None and pressure_data is not None and lux_data is not None and aq_index is not None and aq_accuracy is not None and bvoc_data is not None and co2_data is not None and gas_data is not None and peak_amp_data is not None and dba_data is not None:
           try:
             # Send data to MQTT
             now = datetime.datetime.now()
-            client.publish(channel, JSON_mqtt_data,1,True)
+            client.publish(channel, JSON_mqtt_data,1,True) ## Send to Telegraf
+            client.publish(channel, HA_mqtt_data,1,True) ## Send to Home Assistant
             sys.stdout.flush()
           except Exception:
             # Error
