@@ -17,6 +17,7 @@ clientName = "EnviroPi"         # The name your client reports to MQTT broker
 channel = "homedev"             # The channel the MQTT data is published to
 room = "living-room"            # The room your sensor is in - i.e. living-room
 zone = "downstairs"             # The zone your sensor is in - i.e. upstairs
+sensor = "bme280"               # The type of sensor used
 
 # Define the time between sending data to MQTT broker - default is 60 seconds
 period = 60
@@ -52,16 +53,30 @@ while True:
         # Get the readings from the BME280 sensor
         temperature,pressure,humidity = bme280.readBME280All()
         # Sort the data for JSON - variables set earlier used here
+        ## New structure
         raw_mqtt_data = {
-            room : {
-                "temperature" : temperature,
-                "humidity" : humidity,
-                "pressure" : pressure
+            zone : {
+                room : {
+                    sensor : {
+                        "temperature" : temperature,
+                        "humidity" : humidity,
+                        "pressure" : pressure
+                    },
+                },
             },
-            "device" : room,
-            "sensor" : "BME280",
-            "level" : zone
         }
+
+        ## Previous structure
+        #raw_mqtt_data = {
+        #    room : {
+        #        "temperature" : temperature,
+        #        "humidity" : humidity,
+        #        "pressure" : pressure
+        #    },
+        #    "device" : room,
+        #    "sensor" : "BME280",
+        #    "level" : zone
+        #}
         JSON_mqtt_data = json.dumps(raw_mqtt_data)
         # Now try sending the data to MQTT broker
         if temperature is not None and pressure is not None and humidity is not None:

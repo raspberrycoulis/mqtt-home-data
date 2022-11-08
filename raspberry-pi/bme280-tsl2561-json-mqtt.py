@@ -20,6 +20,8 @@ clientName = "EnviroPi"         # The name your client reports to MQTT broker
 channel = "homedev"             # The channel the MQTT data is published to
 room = "living-room"            # The room your sensor is in - i.e. living-room
 zone = "downstairs"             # The zone your sensor is in - i.e. upstairs
+sensor-1 = "bme280"
+sensor-2 = "tsl2561"
 
 # Define the time between sending data to MQTT broker - default is 60 seconds
 period = 60
@@ -69,22 +71,39 @@ while True:
         # Get the reading from the TSL2561 sensor
         lux = get_light()
         # Sort the data for JSON - variables set earlier used here
+        ## New structure (UNTESTED)
         raw_mqtt_data = {
-            room : {
-                "bme280" : {
-                "sensor" : "BME280",
-                "temperature" : temperature,
-                "humidity" : humidity,
-                "pressure" : pressure
-                },
-                "tsl2561" : {
-                "sensor" : "TSL2561",
-                "lux" : lux
+            zone : {
+                room : {
+                    sensor-1 : {
+                        "temperature" : temperature,
+                        "humidity" : humidity,
+                        "pressure" : pressure
+                    },
+                    sensor-2 : {
+                        "lux" : lux
+                    },
                 },
             },
-            "device" : room,
-            "level" : zone
         }
+
+        ## Previous structure
+        #raw_mqtt_data = {
+        #    room : {
+        #        "bme280" : {
+        #        "sensor" : "BME280",
+        #        "temperature" : temperature,
+        #        "humidity" : humidity,
+        #        "pressure" : pressure
+        #        },
+        #        "tsl2561" : {
+        #        "sensor" : "TSL2561",
+        #        "lux" : lux
+        #        },
+        #    },
+        #    "device" : room,
+        #    "level" : zone
+        #}
         JSON_mqtt_data = json.dumps(raw_mqtt_data)
         # Now try sending the data to MQTT broker
         if temperature is not None and pressure is not None and humidity is not None and lux is not None:
