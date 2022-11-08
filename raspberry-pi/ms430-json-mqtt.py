@@ -115,7 +115,7 @@ while (True):
 
     # Sort the data for JSON - variables set earlier used here
     raw_matt_data = {
-        room: {
+        room : {
             sensor : {
                 zone : {
                     "temperature" : temperature_data,
