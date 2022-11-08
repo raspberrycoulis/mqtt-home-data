@@ -23,10 +23,11 @@ print_data_as_columns = False
 
 # MQTT details
 brokerAddress = "192.168.1.24"  # Update accordingly
-clientName = "MS430-Pi"         # Update accordingly
+clientName = "wordclockpi"      # Update accordingly
 channel = "homedev"             # Update accordingly
-room = "office-ms430"           # Update accordingly
+room = "office"                  # Update accordingly
 zone = "upstairs"               # Update accordingly
+sensor = "ms430"                # Update accordingly
 
 # Define the time between sending data to MQTT broker - default is 60 seconds
 period = 60
@@ -113,57 +114,32 @@ while (True):
     dba_data = sound_data['SPL_dBA']
 
     # Sort the data for JSON - variables set earlier used here
-    raw_mqtt_data = {
-        room : {
-            "ms430" : {
-            "sensor" : "MS430",
-            "temperature" : temperature_data,
-            "humidity" : humidity_data,
-            "pressure" : pressure_data,
-            "lux" : lux_data,
-            "airquality" : aq_index,
-            "airqual_accuracy" : aq_accuracy,
-            "breath-voc" : bvoc_data,
-            "est-co2" : co2_data,
-            "gas-resistance" : gas_data,
-            "peak-amplitude" : peak_amp_data,
-            "dba" : dba_data
+    raw_matt_data = {
+        room: {
+            sensor : {
+                zone : {
+                    "temperature" : temperature_data,
+                    "humidity" : humidity_data,
+                    "pressure" : pressure_data,
+                    "lux" : lux_data,
+                    "airquality" : aq_index,
+                    "airqual_accuracy" : aq_accuracy,
+                    "breath-voc" : bvoc_data,
+                    "est-co2" : co2_data,
+                    "gas-resistance" : gas_data,
+                    "peak-amplitude" : peak_amp_data,
+                    "dba" : dba_data
+                },
             },
         },
-        "device" : room,
-        "level" : zone
     }
     JSON_mqtt_data = json.dumps(raw_mqtt_data)
-
-    # Sort data for Home Assistant
-    raw_ha_mqtt_data = {
-        "details" : {
-            "sensor" : "MS430",
-            "device" : room,
-            "level" : zone
-        },
-        "values" : {
-            "temperature" : temperature_data,
-            "humidity" : humidity_data,
-            "pressure" : pressure_data,
-            "lux" : lux_data,
-            "airquality" : aq_index,
-            "airqual_accuracy" : aq_accuracy,
-            "breath-voc" : bvoc_data,
-            "est-co2" : co2_data,
-            "gas-resistance" : gas_data,
-            "peak-amplitude" : peak_amp_data,
-            "dba" : dba_data
-        },
-    }
-    HA_mqtt_data = json.dumps(raw_ha_mqtt_data)
     # Now try sending the data to MQTT broker
     if temperature_data is not None and humidity_data is not None and pressure_data is not None and lux_data is not None and aq_index is not None and aq_accuracy is not None and bvoc_data is not None and co2_data is not None and gas_data is not None and peak_amp_data is not None and dba_data is not None:
           try:
             # Send data to MQTT
             now = datetime.datetime.now()
-            client.publish(channel, JSON_mqtt_data,1,True) ## Send to Telegraf
-            client.publish(channel, HA_mqtt_data,1,True) ## Send to Home Assistant
+            client.publish(channel, JSON_mqtt_data,1,True)
             sys.stdout.flush()
           except Exception:
             # Error
