@@ -14,7 +14,7 @@ from microdotphat import write_string, set_decimal, clear, show, set_brightness
 brokerAddress = "192.168.1.24"  # IP or URL of your MQTT broker
 clientName = "PiZeroThomas"     # The name your client reports to MQTT broker
 channel = "homedev"             # The channel the MQTT data is published to
-room = "thomas-room"            # The room your sensor is in - i.e. living-room
+room = "thomas_room"            # The room your sensor is in - i.e. living-room
 zone = "upstairs"               # The zone your sensor is in - i.e. upstairs
 sensor = "bme280"               # The type of sensor used
 
