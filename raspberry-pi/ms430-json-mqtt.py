@@ -5,6 +5,7 @@ import paho.mqtt.client as mqtt
 import time
 import datetime
 import json
+import signal
 import sys
 
 #########################################################
@@ -56,6 +57,20 @@ print("Entering cycle mode and waiting for data. Press ctrl-c to exit.")
 
 I2C_bus.write_byte(i2c_7bit_address, CYCLE_MODE_CMD)
 
+def cleanup_and_exit(signum=None, frame=None):
+    print("Stopping.")
+    sys.stdout.flush()
+    try:
+        client.loop_stop()
+        client.disconnect()
+    except Exception:
+        pass
+    try:
+        GPIO.cleanup()
+    except Exception:
+        pass
+    sys.exit(0)
+
 # For MQTT connections
 def on_disconnect(client, userdata, rc):
     if rc!=0:
@@ -80,6 +95,9 @@ client.connect(brokerAddress)
 while not client.connected_flag:
     print("Connecting...")
     time.sleep(1)
+
+signal.signal(signal.SIGTERM, cleanup_and_exit)
+signal.signal(signal.SIGINT, cleanup_and_exit)
 
 last_publish = 0.0
 
@@ -168,6 +186,5 @@ while (True):
     else:
       print("-------------------------------------------")
   
-  except (KeyboardInterrupt, SystemExit):
-    sys.exit("Goodbye!")
-    pass
+  except KeyboardInterrupt:
+    cleanup_and_exit()
