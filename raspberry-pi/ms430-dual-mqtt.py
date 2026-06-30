@@ -113,8 +113,8 @@ def now_display():
 def build_payloads(i2c_bus):
     """
     Read the sensor once, then build both payload formats:
-    - legacy nested JSON for NAS / InfluxDB / Grafana
-    - flat JSON for Home Assistant
+    - legacy nested JSON for NAS / InfluxDB / Grafana (field names must match ms430-json-mqtt.py)
+    - flat JSON for Home Assistant (descriptive field names)
     """
 
     air_data = get_air_data(i2c_bus)
@@ -140,6 +140,7 @@ def build_payloads(i2c_bus):
 
     last_update = now_iso()
 
+    # Field names must match ms430-json-mqtt.py so existing Grafana/InfluxDB queries keep working.
     legacy_payload = {
         LOCATION_ZONE: {
             LOCATION_ROOM: {
@@ -147,15 +148,14 @@ def build_payloads(i2c_bus):
                     "temperature": temperature,
                     "humidity": humidity,
                     "pressure": pressure,
-                    "illuminance": illuminance,
-                    "air_quality_index": air_quality_index,
-                    "air_quality_accuracy": air_quality_accuracy,
+                    "lux": illuminance,
+                    "airquality": air_quality_index,
+                    "airqual_accuracy": air_quality_accuracy,
                     "breath_voc": breath_voc,
-                    "estimated_co2": estimated_co2,
+                    "est_co2": estimated_co2,
                     "gas_resistance": gas_resistance,
                     "peak_amplitude": peak_amplitude,
-                    "sound_pressure": sound_pressure,
-                    "last_update": last_update,
+                    "dba": sound_pressure,
                 }
             }
         }
