@@ -16,7 +16,7 @@ except ImportError:
     exit('This script requires the Adafruit Si7021 library, SMBUS and Paho MQTT\nInstall with: sudo pip3 install adafruit-circuitpython-si7021 paho-mqtt smbus')
 
 # Initialise the Si7021 sensor
-sensor = adafruit_si7021.SI7021(board.I2C())
+sensor_device = adafruit_si7021.SI7021(board.I2C())
 
 # MQTT details - Update accordingly
 brokerAddress = "192.168.1.24"  # IP or URL of your MQTT broker
@@ -58,8 +58,8 @@ while not client.connected_flag:
 while True:
     try:
         # Get the readings from the Si7021 sensor
-        temperature = sensor.temperature
-        humidity = sensor.relative_humidity
+        temperature = sensor_device.temperature
+        humidity = sensor_device.relative_humidity
         # Sort the data for JSON - variables set earlier used here
         ## New structure (UNTESTED)
         raw_mqtt_data = {
@@ -89,7 +89,7 @@ while True:
             try:
                 # Send data to MQTT
                 now = datetime.datetime.now()
-                client.publish(channel, JSON_mqtt_data,1,true)
+                client.publish(channel, JSON_mqtt_data,1, retain=True)
                 sys.stdout.flush()
             except Exception:
                 # Error

@@ -4,11 +4,12 @@ from new_sensor_functions import *
 import paho.mqtt.client as mqtt
 import time
 import datetime
+import sys
 
 #########################################################
 # USER-EDITABLE SETTINGS
 
-# How often to read data (every 3, 100, 300 seconds)
+# MS430 measurement cycle (every 3, 100, or 300 seconds). Use 3s for air-quality calibration.
 cycle_period = CYCLE_PERIOD_3_S
 
 # Which particle sensor, if any, is attached
@@ -25,6 +26,9 @@ brokerAddress = "192.168.1.24"  # Update accordingly
 clientName = "MS430-Pi"         # Update accordingly
 room = "office-ms430"            # Update accordingly
 zone = "upstairs"               # Update accordingly
+
+# How often to read sensors and publish to MQTT (seconds). Independent of cycle_period.
+period = 60
 
 # END OF USER-EDITABLE SETTINGS
 #########################################################
@@ -74,13 +78,21 @@ while not client.connected_flag:
     print("Connecting...")
     time.sleep(1)
 
+last_publish = 0.0
+
 while (True):
   try:
-    # Get the time
-    now = datetime.datetime.now()
     # Wait for the next new data release, indicated by a falling edge on READY
     while (not GPIO.event_detected(READY_pin)):
       sleep(0.05)
+
+    # Device keeps cycling for calibration; only read and publish every `period` seconds
+    now_mono = time.monotonic()
+    if now_mono - last_publish < period:
+      continue
+
+    last_publish = now_mono
+    now = datetime.datetime.now()
 
     # Temperature and humidity data
     air_data = get_air_data(I2C_bus)
@@ -118,7 +130,6 @@ while (True):
     print("A-weighted sound pressure = {:.1f} dBA".format(sound_data['SPL_dBA']))
     client.publish("sensors", "sound-decibels,room=" + str(room) + ",floor=" + str(zone) + " value=" + "{:.1f}".format(sound_data['SPL_dBA']))
     print("Data sent to MQTT broker " + str(brokerAddress) + " at " + (now.strftime("%H:%M:%S on %d/%m/%Y")))
-    time.sleep(60)
 
     if (particleSensor != PARTICLE_SENSOR_OFF):
       raw_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, PARTICLE_DATA_READ, PARTICLE_DATA_BYTES)

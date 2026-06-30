@@ -5,11 +5,12 @@ import paho.mqtt.client as mqtt
 import time
 import datetime
 import json
+import sys
 
 #########################################################
 # USER-EDITABLE SETTINGS
 
-# How often to read data (every 3, 100, 300 seconds)
+# MS430 measurement cycle (every 3, 100, or 300 seconds). Use 3s for air-quality calibration.
 cycle_period = CYCLE_PERIOD_3_S
 
 # Which particle sensor, if any, is attached
@@ -29,7 +30,7 @@ room = "office"                  # Update accordingly
 zone = "upstairs"               # Update accordingly
 sensor = "ms430"                # Update accordingly
 
-# Define the time between sending data to MQTT broker - default is 60 seconds
+# How often to read sensors and publish to MQTT (seconds). Independent of cycle_period.
 period = 60
 
 # END OF USER-EDITABLE SETTINGS
@@ -80,13 +81,20 @@ while not client.connected_flag:
     print("Connecting...")
     time.sleep(1)
 
+last_publish = 0.0
+
 while (True):
   try:
-    # Get the time
-    now = datetime.datetime.now()
     # Wait for the next new data release, indicated by a falling edge on READY
     while (not GPIO.event_detected(READY_pin)):
       sleep(0.05)
+
+    # Device keeps cycling for calibration; only read and publish every `period` seconds
+    now_mono = time.monotonic()
+    if now_mono - last_publish < period:
+      continue
+
+    last_publish = now_mono
 
     # Temperature and humidity data
     air_data = get_air_data(I2C_bus)
@@ -149,7 +157,6 @@ while (True):
             # Success!
             print ("Data sent to MQTT broker " + str(brokerAddress) + " at " + (now.strftime("%H:%M:%S on %d/%m/%Y")))
             sys.stdout.flush()
-    time.sleep(period)
 
     if (particleSensor != PARTICLE_SENSOR_OFF):
       raw_data = I2C_bus.read_i2c_block_data(i2c_7bit_address, PARTICLE_DATA_READ, PARTICLE_DATA_BYTES)

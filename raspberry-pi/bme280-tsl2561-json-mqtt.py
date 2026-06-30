@@ -20,8 +20,8 @@ clientName = "EnviroPi"         # The name your client reports to MQTT broker
 channel = "homedev"             # The channel the MQTT data is published to
 room = "living-room"            # The room your sensor is in - i.e. living-room
 zone = "downstairs"             # The zone your sensor is in - i.e. upstairs
-sensor-1 = "bme280"
-sensor-2 = "tsl2561"
+sensor_1 = "bme280"
+sensor_2 = "tsl2561"
 
 # Define the time between sending data to MQTT broker - default is 60 seconds
 period = 60
@@ -75,12 +75,12 @@ while True:
         raw_mqtt_data = {
             zone : {
                 room : {
-                    sensor-1 : {
+                    sensor_1 : {
                         "temperature" : temperature,
                         "humidity" : humidity,
                         "pressure" : pressure
                     },
-                    sensor-2 : {
+                    sensor_2 : {
                         "lux" : lux
                     },
                 },

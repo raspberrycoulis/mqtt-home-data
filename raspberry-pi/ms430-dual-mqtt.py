@@ -29,6 +29,7 @@ from new_sensor_functions import *
 # Sensor settings
 # ---------------------------------------------------------------------------
 
+# MS430 measurement cycle (every 3, 100, or 300 seconds). Use 3s for air-quality calibration.
 CYCLE_PERIOD = CYCLE_PERIOD_3_S
 PARTICLE_SENSOR = PARTICLE_SENSOR_OFF
 
@@ -82,6 +83,7 @@ RETAIN_AVAILABILITY = True
 # ---------------------------------------------------------------------------
 
 MQTT_QOS = 1
+# How often to read sensors and publish to MQTT (seconds). Independent of CYCLE_PERIOD.
 PUBLISH_PERIOD = 60
 EXPIRE_AFTER = PUBLISH_PERIOD * 3
 
@@ -549,16 +551,24 @@ def main():
         lambda signum, frame: cleanup_and_exit(nas_client, ha_client, gpio),
     )
 
+    last_publish = 0.0
+
     while True:
         try:
             while not gpio.event_detected(READY_pin):
                 time.sleep(0.05)
 
+            # Device keeps cycling for calibration; only read and publish every PUBLISH_PERIOD seconds
+            now_mono = time.monotonic()
+            if now_mono - last_publish < PUBLISH_PERIOD:
+                continue
+
+            last_publish = now_mono
+
             legacy_payload, ha_payload = build_payloads(i2c_bus)
 
             if not payload_has_required_values(ha_payload):
                 print(f"Skipping publish because payload has missing values: {ha_payload}", flush=True)
-                time.sleep(PUBLISH_PERIOD)
                 continue
 
             if PUBLISH_LEGACY_PAYLOAD and nas_client:
@@ -587,14 +597,11 @@ def main():
 
             print(f"Publish cycle complete at {now_display()}", flush=True)
 
-            time.sleep(PUBLISH_PERIOD)
-
         except KeyboardInterrupt:
             cleanup_and_exit(nas_client, ha_client, gpio)
 
         except Exception as exc:
             print(f"Error during sensor read/publish cycle: {exc}", flush=True)
-            time.sleep(PUBLISH_PERIOD)
 
 
 if __name__ == "__main__":
