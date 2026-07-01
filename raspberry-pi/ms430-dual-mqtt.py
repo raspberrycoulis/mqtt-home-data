@@ -130,8 +130,25 @@ def build_payloads(i2c_bus):
         pressure = safe_round(air_data.get("P_Pa") / 100, 2)
 
     illuminance = safe_round(light_data.get("illum_lux"), 2)
-    air_quality_index = safe_round(air_quality_data.get("AQI"), 0)
-    air_quality_accuracy = safe_round(air_quality_data.get("AQI_accuracy"), 0)
+
+    aqi_accuracy_code = air_quality_data.get("AQI_accuracy")
+    if aqi_accuracy_code is not None:
+        aqi_accuracy_code = int(aqi_accuracy_code)
+
+    raw_aqi = air_quality_data.get("AQI")
+    air_quality_index = safe_round(raw_aqi, 0)
+    air_quality_accuracy = safe_round(aqi_accuracy_code, 0)
+    air_quality_valid = aqi_accuracy_code is not None and aqi_accuracy_code > 0
+    air_quality_accuracy_label = (
+        interpret_AQI_accuracy(aqi_accuracy_code)
+        if aqi_accuracy_code is not None
+        else None
+    )
+    if air_quality_valid and raw_aqi is not None:
+        air_quality_label = interpret_AQI_value(float(raw_aqi))
+    else:
+        air_quality_label = None
+
     breath_voc = safe_round(air_quality_data.get("bVOC"), 3)
     estimated_co2 = safe_round(air_quality_data.get("CO2e"), 0)
     gas_resistance = safe_round(air_data.get("G_ohm"), 0)
@@ -168,6 +185,9 @@ def build_payloads(i2c_bus):
         "illuminance": illuminance,
         "air_quality_index": air_quality_index,
         "air_quality_accuracy": air_quality_accuracy,
+        "air_quality_accuracy_label": air_quality_accuracy_label,
+        "air_quality_label": air_quality_label,
+        "air_quality_valid": air_quality_valid,
         "breath_voc": breath_voc,
         "estimated_co2": estimated_co2,
         "gas_resistance": gas_resistance,
@@ -187,6 +207,8 @@ def payload_has_required_values(payload):
         "illuminance",
         "air_quality_index",
         "air_quality_accuracy",
+        "air_quality_accuracy_label",
+        "air_quality_valid",
         "breath_voc",
         "estimated_co2",
         "gas_resistance",
@@ -291,7 +313,7 @@ def publish_ha_discovery(client):
 
     origin = {
         "name": "mqtt-home-data",
-        "sw": "1.0",
+        "sw": "1.1",
         "url": "https://github.com/raspberrycoulis/mqtt-home-data",
     }
 
@@ -351,6 +373,37 @@ def publish_ha_discovery(client):
             "precision": 0,
         },
         {
+            "key": "air_quality_accuracy_label",
+            "name": "Air Quality Accuracy Status",
+            "device_class": None,
+            "state_class": None,
+            "unit": None,
+            "icon": "mdi:information-outline",
+            "precision": None,
+        },
+        {
+            "key": "air_quality_label",
+            "name": "Air Quality Rating",
+            "device_class": None,
+            "state_class": None,
+            "unit": None,
+            "icon": "mdi:air-filter",
+            "precision": None,
+        },
+        {
+            "key": "air_quality_valid",
+            "name": "Air Quality Valid",
+            "component": "binary_sensor",
+            "device_class": None,
+            "state_class": None,
+            "unit": None,
+            "icon": "mdi:check-circle-outline",
+            "precision": None,
+            "value_template": "{% if value_json.air_quality_valid %}on{% else %}off{% endif %}",
+            "payload_on": "on",
+            "payload_off": "off",
+        },
+        {
             "key": "breath_voc",
             "name": "Breath VOC",
             "device_class": "volatile_organic_compounds_parts",
@@ -398,9 +451,15 @@ def publish_ha_discovery(client):
     ]
 
     for sensor_def in sensors:
+        component = sensor_def.get("component", "sensor")
         object_id = f"{DEVICE_ID}_{sensor_def['key']}"
         unique_id = object_id
-        config_topic = f"{DISCOVERY_PREFIX}/sensor/{object_id}/config"
+        config_topic = f"{DISCOVERY_PREFIX}/{component}/{object_id}/config"
+
+        if "value_template" in sensor_def:
+            value_template = sensor_def["value_template"]
+        else:
+            value_template = "{{ value_json['" + sensor_def["key"] + "'] }}"
 
         payload = {
             "name": sensor_def["name"],
@@ -410,13 +469,15 @@ def publish_ha_discovery(client):
             "availability_topic": HA_AVAILABILITY_TOPIC,
             "payload_available": "online",
             "payload_not_available": "offline",
-            "value_template": "{{ value_json['" + sensor_def["key"] + "'] }}",
+            "value_template": value_template,
             "device": device,
             "origin": origin,
             "expire_after": EXPIRE_AFTER,
             "qos": MQTT_QOS,
-            "suggested_display_precision": sensor_def["precision"],
         }
+
+        if sensor_def.get("precision") is not None:
+            payload["suggested_display_precision"] = sensor_def["precision"]
 
         if sensor_def["device_class"]:
             payload["device_class"] = sensor_def["device_class"]
@@ -429,6 +490,10 @@ def publish_ha_discovery(client):
 
         if sensor_def["icon"]:
             payload["icon"] = sensor_def["icon"]
+
+        if component == "binary_sensor":
+            payload["payload_on"] = sensor_def["payload_on"]
+            payload["payload_off"] = sensor_def["payload_off"]
 
         safe_publish(
             client=client,
